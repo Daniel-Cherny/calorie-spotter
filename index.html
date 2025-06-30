@@ -50,15 +50,6 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .loading-shimmer {
-            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-        }
-        @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
-        }
         .button-hover {
             transition: all 0.2s ease;
         }
@@ -422,7 +413,7 @@
         let consumedToday = [];
         let favorites = [];
 
-        // Restaurant data with Upfordayz updated menu
+        // Complete Restaurant data
         const restaurants = [
             // McDonald's
             { id: 1, restaurant: "McDonald's", item: "Big Mac", calories: 580, category: "Burgers", protein: 25, carbs: 46, fat: 33, price: 5.99, distance: 0.3, rating: 3.9, verified: true, source: "McDonald's Official" },
@@ -461,4 +452,373 @@
             { id: 22, restaurant: "Upfordayz", item: "Chai Latte", calories: 180, category: "Tea", protein: 6, carbs: 32, fat: 4, price: 5.25, distance: 0.7, rating: 4.5, verified: true, source: "Official Menu", isLocal: true },
             // Juices & Smoothies
             { id: 23, restaurant: "Upfordayz", item: "Chocolate Dream Shake", calories: 380, category: "Shakes", protein: 25, carbs: 42, fat: 12, price: 10.95, distance: 0.7, rating: 4.5, verified: true, source: "Official Menu", isLocal: true },
-            { id: 24, restaurant: "Upfor
+            { id: 24, restaurant: "Upfordayz", item: "Red Prime Smoothie", calories: 280, category: "Smoothies", protein: 12, carbs: 48, fat: 6, price: 9.95, distance: 0.7, rating: 4.5, verified: true, source: "Official Menu", isLocal: true },
+            { id: 25, restaurant: "Upfordayz", item: "Go Green Juice", calories: 120, category: "Juices", protein: 4, carbs: 28, fat: 1, price: 8.95, distance: 0.7, rating: 4.5, verified: true, source: "Official Menu", isLocal: true },
+            { id: 26, restaurant: "Upfordayz", item: "Why Ginger Juice", calories: 90, category: "Juices", protein: 2, carbs: 22, fat: 0, price: 8.95, distance: 0.7, rating: 4.5, verified: true, source: "Official Menu", isLocal: true },
+            { id: 27, restaurant: "Upfordayz", item: "Orange Shot", calories: 25, category: "Shots", protein: 1, carbs: 6, fat: 0, price: 4.50, distance: 0.7, rating: 4.5, verified: true, source: "Official Menu", isLocal: true },
+            // Food
+            { id: 28, restaurant: "Upfordayz", item: "Egg Sandwich", calories: 420, category: "Breakfast", protein: 22, carbs: 35, fat: 22, price: 10.50, distance: 0.7, rating: 4.5, verified: true, source: "Official Menu", isLocal: true },
+            { id: 29, restaurant: "Upfordayz", item: "Wellness Sandwich", calories: 380, category: "Breakfast", protein: 18, carbs: 42, fat: 16, price: 11.95, distance: 0.7, rating: 4.5, verified: true, source: "Official Menu", isLocal: true },
+            { id: 30, restaurant: "Upfordayz", item: "Pancake's Favorite", calories: 520, category: "Breakfast", protein: 12, carbs: 68, fat: 22, price: 13.50, distance: 0.7, rating: 4.5, verified: true, source: "Official Menu", isLocal: true },
+            { id: 31, restaurant: "Upfordayz", item: "Yogurt Bowl", calories: 320, category: "Breakfast", protein: 15, carbs: 48, fat: 8, price: 12.50, distance: 0.7, rating: 4.5, verified: true, source: "Official Menu", isLocal: true },
+            { id: 32, restaurant: "Upfordayz", item: "Eat With Purpose Bowl", calories: 450, category: "Bowls", protein: 18, carbs: 52, fat: 20, price: 12.95, distance: 0.7, rating: 4.5, verified: true, source: "Official Menu", isLocal: true },
+
+            // Peasant Pies - Local SF
+            { id: 33, restaurant: "Peasant Pies", item: "Beef & Potato Pie", calories: 530, category: "Savory Pies", protein: 18, carbs: 46, fat: 30, price: 12.95, distance: 1.1, rating: 4.3, verified: true, source: "Official Menu", isLocal: true },
+            { id: 34, restaurant: "Peasant Pies", item: "Chicken & Potato Pie", calories: 290, category: "Savory Pies", protein: 10, carbs: 51, fat: 5, price: 11.95, distance: 1.1, rating: 4.3, verified: true, source: "Official Menu", isLocal: true },
+            { id: 35, restaurant: "Peasant Pies", item: "Ham, Eggs & Cheese Pie", calories: 400, category: "Breakfast Pies", protein: 20, carbs: 38, fat: 18, price: 10.95, distance: 1.1, rating: 4.3, verified: true, source: "Official Menu", isLocal: true },
+            { id: 36, restaurant: "Peasant Pies", item: "Spinach & Feta Cheese Pie", calories: 340, category: "Vegetarian Pies", protein: 18, carbs: 39, fat: 13, price: 9.95, distance: 1.1, rating: 4.3, verified: true, source: "Official Menu", isLocal: true },
+            { id: 37, restaurant: "Peasant Pies", item: "Garbanzo Bean Curry Pie", calories: 270, category: "Vegan Pies", protein: 10, carbs: 52, fat: 2.5, price: 9.95, distance: 1.1, rating: 4.3, verified: true, source: "Official Menu", isLocal: true },
+
+            // Trailer Birds Hot Chicken - Local SF
+            { id: 38, restaurant: "Trailer Birds", item: "Hot Chicken Sandwich", calories: 860, category: "Sandwiches", protein: 45, carbs: 65, fat: 38, price: 13.95, distance: 0.9, rating: 4.6, verified: true, source: "Official Menu", isLocal: true },
+            { id: 39, restaurant: "Trailer Birds", item: "3 Hot Tenders", calories: 470, category: "Chicken", protein: 35, carbs: 25, fat: 28, price: 9.95, distance: 0.9, rating: 4.6, verified: true, source: "Official Menu", isLocal: true },
+            { id: 40, restaurant: "Trailer Birds", item: "6 Hot Tenders", calories: 890, category: "Chicken", protein: 65, carbs: 45, fat: 52, price: 16.95, distance: 0.9, rating: 4.6, verified: true, source: "Official Menu", isLocal: true },
+            { id: 41, restaurant: "Trailer Birds", item: "Seasoned Crispy Tots", calories: 350, category: "Sides", protein: 5, carbs: 48, fat: 16, price: 6.95, distance: 0.9, rating: 4.6, verified: true, source: "Official Menu", isLocal: true },
+            { id: 42, restaurant: "Trailer Birds", item: "Hand-Cut Fries", calories: 240, category: "Sides", protein: 4, carbs: 35, fat: 10, price: 5.95, distance: 0.9, rating: 4.6, verified: true, source: "Official Menu", isLocal: true }
+        ];
+
+        // Helper functions
+        function getCalorieBadge(calories) {
+            if (calories < 300) return 'bg-green-100 text-green-800';
+            if (calories < 500) return 'bg-yellow-100 text-yellow-800';
+            return 'bg-red-100 text-red-800';
+        }
+
+        function createRestaurantCard(item, index = 0) {
+            return `
+                <div class="restaurant-card bg-white rounded-xl shadow-sm p-4 fade-in" style="animation-delay: ${index * 50}ms">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="text-lg font-semibold text-gray-800">${item.item}</h3>
+                                <div class="flex items-center space-x-2">
+                                    <span class="px-3 py-1 rounded-full text-xs font-medium ${getCalorieBadge(item.calories)} transition-all duration-300">
+                                        ${item.calories} cal
+                                    </span>
+                                    ${item.verified ? 
+                                        '<span class="text-green-600 transition-transform duration-300 hover:scale-110" title="Verified Data">🛡️</span>' : 
+                                        '<span class="text-orange-500 transition-transform duration-300 hover:scale-110" title="Estimated">⚠️</span>'
+                                    }
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center text-gray-600 mb-2">
+                                <span class="font-medium gradient-text">${item.restaurant}</span>
+                                <span class="mx-2">•</span>
+                                <span>${item.category}</span>
+                                ${item.isLocal ? '<span class="ml-2 px-2 py-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-xs rounded-full animate-pulse">Local SF</span>' : ''}
+                            </div>
+                            
+                            <div class="flex items-center text-sm text-gray-500 mb-3">
+                                <span>📍</span>
+                                <span class="ml-1">${item.distance} mi</span>
+                                <span class="mx-2">•</span>
+                                <span>⭐</span>
+                                <span class="ml-1">${item.rating}</span>
+                                <span class="mx-2">•</span>
+                                <span class="font-medium text-green-600">${item.price}</span>
+                            </div>
+                            
+                            <div class="flex justify-between items-center mb-2">
+                                <div class="text-xs text-gray-500 bg-gray-50 rounded-lg px-2 py-1">
+                                    <span class="font-medium">P:</span> ${item.protein}g • 
+                                    <span class="font-medium">C:</span> ${item.carbs}g • 
+                                    <span class="font-medium">F:</span> ${item.fat}g
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button onclick="addToFavorites(${item.id})" 
+                                            class="button-hover p-2 bg-gradient-to-r from-pink-100 to-red-100 text-red-600 rounded-full hover:from-pink-200 hover:to-red-200 transition-all duration-300">
+                                        ❤️
+                                    </button>
+                                    <button onclick="addToTracking(${item.id})" 
+                                            class="button-hover p-2 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-600 rounded-full hover:from-blue-200 hover:to-purple-200 transition-all duration-300">
+                                        ➕
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="text-xs text-gray-400 flex items-center">
+                                ${item.verified ? '✅ Verified' : '⚠️ Estimated'} • ${item.source}
+                                ${item.verified ? '<span class="ml-2 text-green-500">•</span>' : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Enhanced search with debouncing and better UX
+        let searchTimeout;
+        let isSearching = false;
+
+        function handleSearchInput(value) {
+            const spinner = document.getElementById('searchSpinner');
+            const suggestions = document.getElementById('searchSuggestions');
+            
+            // Show spinner for longer searches
+            if (value.length > 2 && !isSearching) {
+                spinner.classList.remove('hidden');
+                isSearching = true;
+            }
+            
+            // Debounce the search
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                filterRestaurants(value);
+                spinner.classList.add('hidden');
+                isSearching = false;
+                
+                // Show/hide suggestions
+                if (value.length === 0) {
+                    suggestions.classList.remove('hidden');
+                } else {
+                    suggestions.classList.add('hidden');
+                }
+            }, 150);
+        }
+
+        function filterRestaurants(searchTerm = '') {
+            if (!searchTerm) {
+                searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            } else {
+                searchTerm = searchTerm.toLowerCase();
+            }
+            
+            const container = document.getElementById('restaurantContainer');
+            
+            let filteredRestaurants;
+            if (!searchTerm.trim()) {
+                filteredRestaurants = restaurants;
+            } else {
+                filteredRestaurants = restaurants.filter(item => 
+                    item.item.toLowerCase().includes(searchTerm) ||
+                    item.restaurant.toLowerCase().includes(searchTerm) ||
+                    item.category.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            // Enhanced empty state
+            if (filteredRestaurants.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 text-gray-500 fade-in">
+                        <div class="text-6xl mb-4 animate-bounce">🔍</div>
+                        <h3 class="text-lg font-medium mb-2">No restaurants found</h3>
+                        <p class="text-sm mb-4">Try searching for something else</p>
+                        <div class="flex flex-wrap justify-center gap-2 mt-4">
+                            <button onclick="quickSearch('coffee')" class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm button-hover">coffee</button>
+                            <button onclick="quickSearch('sandwich')" class="px-3 py-1 bg-green-100 text-green-600 rounded-full text-sm button-hover">sandwich</button>
+                            <button onclick="quickSearch('low calorie')" class="px-3 py-1 bg-purple-100 text-purple-600 rounded-full text-sm button-hover">low calorie</button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = filteredRestaurants.map((item, index) => createRestaurantCard(item, index)).join('');
+            }
+        }
+
+        function quickSearch(term) {
+            document.getElementById('searchInput').value = term;
+            handleSearchInput(term);
+        }
+
+        // Tab switching functionality
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to selected nav item
+            event.target.closest('.nav-item').classList.add('active');
+            
+            currentTab = tabName;
+        }
+
+        // Tracking functionality
+        function addToFavorites(id) {
+            const item = restaurants.find(r => r.id === id);
+            
+            // Enhanced feedback with animation
+            const button = event.target.closest('button');
+            button.style.transform = 'scale(1.2)';
+            button.classList.add('animate-pulse');
+            
+            setTimeout(() => {
+                button.style.transform = '';
+                button.classList.remove('animate-pulse');
+                showToast(`❤️ Added "${item.item}" to favorites!`, 'success');
+            }, 200);
+            
+            favorites.push(item);
+        }
+
+        function addToTracking(id) {
+            const item = restaurants.find(r => r.id === id);
+            
+            // Enhanced feedback with animation
+            const button = event.target.closest('button');
+            button.style.transform = 'scale(1.2)';
+            button.classList.add('animate-pulse');
+            
+            setTimeout(() => {
+                button.style.transform = '';
+                button.classList.remove('animate-pulse');
+                showToast(`📊 Added "${item.item}" (${item.calories} cal) to daily tracking!`, 'success');
+            }, 200);
+            
+            // Add to consumed today
+            consumedToday.push({...item, timestamp: Date.now()});
+            dailyCalories += item.calories;
+            
+            // Update tracking display
+            updateTrackingDisplay();
+        }
+
+        function updateTrackingDisplay() {
+            const calorieProgress = Math.min((dailyCalories / dailyGoal) * 100, 100);
+            const remainingCalories = dailyGoal - dailyCalories;
+            
+            document.getElementById('calorieDisplay').textContent = `${dailyCalories} / ${dailyGoal}`;
+            document.getElementById('progressBar').style.width = `${calorieProgress}%`;
+            
+            const remainingElement = document.getElementById('remainingCalories');
+            if (remainingCalories >= 0) {
+                remainingElement.textContent = `${remainingCalories} calories remaining`;
+                remainingElement.className = 'text-lg font-semibold text-green-600';
+                document.getElementById('progressBar').className = 'progress-bar h-4 rounded-full bg-green-500';
+            } else {
+                remainingElement.textContent = `${Math.abs(remainingCalories)} calories over goal`;
+                remainingElement.className = 'text-lg font-semibold text-red-600';
+                document.getElementById('progressBar').className = 'progress-bar h-4 rounded-full bg-red-500';
+            }
+            
+            // Update macros
+            const totalProtein = consumedToday.reduce((sum, item) => sum + item.protein, 0);
+            const totalCarbs = consumedToday.reduce((sum, item) => sum + item.carbs, 0);
+            const totalFat = consumedToday.reduce((sum, item) => sum + item.fat, 0);
+            
+            document.getElementById('totalProtein').textContent = `${totalProtein}g`;
+            document.getElementById('totalCarbs').textContent = `${totalCarbs}g`;
+            document.getElementById('totalFat').textContent = `${totalFat}g`;
+            
+            // Update meals list
+            updateMealsList();
+        }
+
+        function updateMealsList() {
+            const mealsContainer = document.getElementById('todaysMeals');
+            
+            if (consumedToday.length === 0) {
+                mealsContainer.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <span class="text-4xl mb-3 block">⏰</span>
+                        <p>No meals logged yet</p>
+                        <p class="text-sm">Add verified restaurant items from Discover!</p>
+                    </div>
+                `;
+            } else {
+                mealsContainer.innerHTML = consumedToday.map((item, index) => `
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div class="flex items-center">
+                            <span class="text-green-600 mr-3">🛡️</span>
+                            <div>
+                                <div class="font-medium text-gray-800">${item.item}</div>
+                                <div class="text-sm text-gray-600">${item.restaurant} • ${item.calories} cal</div>
+                            </div>
+                        </div>
+                        <button onclick="removeFromTracking(${index})" class="p-2 text-red-600 hover:bg-red-100 rounded-full">
+                            ➖
+                        </button>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function removeFromTracking(index) {
+            const item = consumedToday[index];
+            dailyCalories -= item.calories;
+            consumedToday.splice(index, 1);
+            updateTrackingDisplay();
+            showToast(`🗑️ Removed "${item.item}" from tracking`, 'info');
+        }
+
+        // Premium functionality
+        function handlePremiumUpgrade() {
+            document.getElementById('paymentModal').classList.remove('hidden');
+        }
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').classList.add('hidden');
+        }
+
+        function processPremiumPayment() {
+            const email = document.getElementById('premiumEmail').value;
+            if (!email) {
+                showToast('Please enter your email address', 'error');
+                return;
+            }
+            
+            isPremium = true;
+            document.getElementById('premiumBadge').classList.remove('hidden');
+            closePaymentModal();
+            showToast('🎉 Welcome to CalorieSpotter Premium!', 'success');
+        }
+
+        // Utility functions
+        function showToast(message, type = 'info') {
+            // Create toast notification
+            const toast = document.createElement('div');
+            toast.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg text-white transition-all duration-300 transform translate-x-full`;
+            
+            if (type === 'success') {
+                toast.classList.add('bg-green-500');
+            } else if (type === 'error') {
+                toast.classList.add('bg-red-500');
+            } else {
+                toast.classList.add('bg-blue-500');
+            }
+            
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            // Animate in
+            setTimeout(() => {
+                toast.classList.remove('translate-x-full');
+            }, 10);
+            
+            // Animate out after 3 seconds
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }
+
+        function captureEmail() {
+            const email = document.getElementById('emailInput').value;
+            if (email) {
+                showToast('🚀 Thanks! We\'ll notify you when the mobile app launches!', 'success');
+                document.getElementById('emailInput').value = '';
+            } else {
+                showToast('Please enter your email address', 'error');
+            }
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            filterRestaurants(); // Show all restaurants initially
+            updateTrackingDisplay(); // Initialize tracking display
+        });
+    </script>
+</body>
+</html>
