@@ -177,14 +177,21 @@
                 { id: 16, restaurant: "Pizza Hut", item: "Personal Pan Pepperoni Pizza", calories: 560, category: "Pizza", protein: 24, carbs: 56, fat: 26, price: 6.99, distance: 1.5, rating: 3.6, address: "Multiple locations", verified: true, source: "Pizza Hut Official" }
             ];
 
+            // Memoize filtered results to prevent unnecessary re-renders
             const filteredRestaurants = useMemo(() => {
+                if (!searchTerm.trim()) return restaurantData;
                 return restaurantData.filter(item => {
-                    const matchesSearch = item.item.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                         item.restaurant.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                         item.category.toLowerCase().includes(searchTerm.toLowerCase());
-                    return matchesSearch;
+                    const searchLower = searchTerm.toLowerCase();
+                    return item.item.toLowerCase().includes(searchLower) ||
+                           item.restaurant.toLowerCase().includes(searchLower) ||
+                           item.category.toLowerCase().includes(searchLower);
                 }).sort((a, b) => a.distance - b.distance);
             }, [searchTerm]);
+
+            // Handle search with useCallback to prevent re-renders
+            const handleSearchChange = React.useCallback((e) => {
+                setSearchTerm(e.target.value);
+            }, []);
 
             const addToConsumed = (item) => {
                 setConsumedToday([...consumedToday, { ...item, timestamp: Date.now() }]);
@@ -447,13 +454,13 @@
                         <div className="relative">
                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                             <input
-                                key="search-input"
                                 type="text"
                                 placeholder="Search verified restaurant items..."
                                 className="w-full pl-10 pr-4 py-3 bg-gray-50 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                                 value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
+                                onChange={handleSearchChange}
                                 autoComplete="off"
+                                spellCheck="false"
                             />
                         </div>
                     </div>
