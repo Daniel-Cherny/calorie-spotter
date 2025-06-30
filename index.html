@@ -7,11 +7,7 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google AdSense (Replace with your AdSense code) -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOURADSENSEID"
-        crossorigin="anonymous"></script>
     <!-- Google Analytics (Replace with your tracking ID) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=GA_TRACKING_ID"></script>
     <script>
@@ -26,7 +22,25 @@
 
     <script type="text/babel">
         const { useState, useEffect, useMemo } = React;
-        const { Search, MapPin, Target, User, Star, Clock, TrendingUp, Lock, Crown, Heart, Plus, Minus, AlertTriangle, Shield, Info, X } = lucideReact;
+
+        // Simple icon components using Unicode symbols
+        const icons = {
+            Search: () => <span>🔍</span>,
+            MapPin: () => <span>📍</span>,
+            Target: () => <span>🎯</span>,
+            User: () => <span>👤</span>,
+            Star: () => <span>⭐</span>,
+            Clock: () => <span>🕐</span>,
+            TrendingUp: () => <span>📈</span>,
+            Lock: () => <span>🔒</span>,
+            Crown: () => <span>👑</span>,
+            Heart: () => <span>❤️</span>,
+            Plus: () => <span>➕</span>,
+            Minus: () => <span>➖</span>,
+            Shield: () => <span>🛡️</span>,
+            Info: () => <span>ℹ️</span>,
+            X: () => <span>❌</span>
+        };
 
         const CalorieSpotterApp = () => {
             const [currentView, setCurrentView] = useState('discover');
@@ -169,7 +183,7 @@
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-2xl max-w-md w-full p-6">
                         <div className="flex items-center mb-4">
-                            <Shield className="h-6 w-6 text-blue-600 mr-3" />
+                            <div className="text-blue-600 mr-3 text-xl"><icons.Shield /></div>
                             <h2 className="text-xl font-bold text-gray-800">Nutrition Information Disclaimer</h2>
                         </div>
                         
@@ -209,14 +223,14 @@
                     <div className="bg-white rounded-2xl max-w-md w-full p-6">
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="text-xl font-bold text-gray-800">Coming Soon: Premium</h2>
-                            <button onClick={() => setShowPaymentModal(false)} className="text-gray-400">
-                                <X className="h-6 w-6" />
+                            <button onClick={() => setShowPaymentModal(false)} className="text-gray-400 text-xl">
+                                <icons.X />
                             </button>
                         </div>
                         
                         <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white p-4 rounded-xl mb-6">
                             <div className="flex items-center mb-2">
-                                <Crown className="h-6 w-6 mr-2" />
+                                <div className="text-xl mr-2"><icons.Crown /></div>
                                 <span className="text-lg font-semibold">Premium Features</span>
                             </div>
                             <div className="text-2xl font-bold mb-1">$4.99/month</div>
@@ -278,28 +292,28 @@
                             onClick={() => setCurrentView('discover')}
                             className={`flex flex-col items-center py-2 px-3 rounded-lg ${currentView === 'discover' ? 'text-blue-600' : 'text-gray-500'}`}
                         >
-                            <Search className="h-5 w-5 mb-1" />
+                            <div className="mb-1"><icons.Search /></div>
                             <span className="text-xs">Discover</span>
                         </button>
                         <button
                             onClick={() => setCurrentView('tracking')}
                             className={`flex flex-col items-center py-2 px-3 rounded-lg ${currentView === 'tracking' ? 'text-blue-600' : 'text-gray-500'}`}
                         >
-                            <Target className="h-5 w-5 mb-1" />
+                            <div className="mb-1"><icons.Target /></div>
                             <span className="text-xs">Track</span>
                         </button>
                         <button
                             onClick={() => setCurrentView('premium')}
                             className={`flex flex-col items-center py-2 px-3 rounded-lg ${currentView === 'premium' ? 'text-blue-600' : 'text-gray-500'}`}
                         >
-                            <Crown className="h-5 w-5 mb-1" />
+                            <div className="mb-1"><icons.Crown /></div>
                             <span className="text-xs">Premium</span>
                         </button>
                         <button
                             onClick={() => setCurrentView('about')}
                             className={`flex flex-col items-center py-2 px-3 rounded-lg ${currentView === 'about' ? 'text-blue-600' : 'text-gray-500'}`}
                         >
-                            <Info className="h-5 w-5 mb-1" />
+                            <div className="mb-1"><icons.Info /></div>
                             <span className="text-xs">Contact</span>
                         </button>
                     </div>
@@ -311,16 +325,15 @@
                     {/* Ad Space */}
                     <div className="bg-gray-100 p-4 mb-4 rounded-lg text-center">
                         <p className="text-sm text-gray-600 mb-2">Advertisement</p>
-                        {/* Replace with actual Google Ad unit */}
                         <div className="bg-white p-4 rounded border-2 border-dashed border-gray-300">
-                            <p className="text-gray-500">Google Ad Space</p>
+                            <p className="text-gray-500">Google Ad Space - Setup After Launch</p>
                         </div>
                     </div>
 
                     {/* Data Source Notice */}
                     <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
                         <div className="flex items-center">
-                            <Shield className="h-5 w-5 text-blue-600 mr-2" />
+                            <div className="text-blue-600 mr-2 text-lg"><icons.Shield /></div>
                             <div>
                                 <p className="text-sm text-blue-800">
                                     <strong>Verified Data Only:</strong> All nutrition information sourced from official restaurant websites.
@@ -333,7 +346,7 @@
                     <div className="bg-white rounded-xl shadow-sm p-4 mb-4">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center">
-                                <MapPin className="h-5 w-5 text-blue-600 mr-2" />
+                                <div className="text-blue-600 mr-2"><icons.MapPin /></div>
                                 <span className="text-gray-700 font-medium">{userLocation}</span>
                             </div>
                             <button className="text-blue-600 text-sm font-medium">Change</button>
@@ -343,7 +356,7 @@
                     {/* Search Bar */}
                     <div className="bg-white rounded-xl shadow-sm p-4 mb-4">
                         <div className="relative">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"><icons.Search /></div>
                             <input
                                 type="text"
                                 placeholder="Search verified restaurant items..."
@@ -366,7 +379,7 @@
                                                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCalorieBadge(item.calories)}`}>
                                                     {item.calories} cal
                                                 </span>
-                                                <Shield className="h-4 w-4 text-green-600" title="Verified Data" />
+                                                <div className="text-green-600" title="Verified Data"><icons.Shield /></div>
                                             </div>
                                         </div>
                                         
@@ -377,10 +390,10 @@
                                         </div>
                                         
                                         <div className="flex items-center text-sm text-gray-500 mb-3">
-                                            <MapPin className="h-3 w-3 mr-1" />
+                                            <div className="mr-1"><icons.MapPin /></div>
                                             <span>{item.distance} mi</span>
                                             <span className="mx-2">•</span>
-                                            <Star className="h-3 w-3 text-yellow-500 mr-1" />
+                                            <div className="text-yellow-500 mr-1"><icons.Star /></div>
                                             <span>{item.rating}</span>
                                             <span className="mx-2">•</span>
                                             <span className="font-medium">${item.price}</span>
@@ -395,19 +408,19 @@
                                                     onClick={() => toggleFavorite(item)}
                                                     className={`p-2 rounded-full ${favorites.some(fav => fav.id === item.id) ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600'}`}
                                                 >
-                                                    <Heart className="h-4 w-4" />
+                                                    <icons.Heart />
                                                 </button>
                                                 <button
                                                     onClick={() => addToConsumed(item)}
                                                     className="p-2 bg-blue-100 text-blue-600 rounded-full"
                                                 >
-                                                    <Plus className="h-4 w-4" />
+                                                    <icons.Plus />
                                                 </button>
                                             </div>
                                         </div>
                                         
                                         <div className="text-xs text-gray-400 flex items-center">
-                                            <Shield className="h-3 w-3 mr-1" />
+                                            <div className="mr-1"><icons.Shield /></div>
                                             <span>Source: {item.source}</span>
                                         </div>
                                     </div>
@@ -438,7 +451,7 @@
                     <div className="bg-white rounded-xl shadow-sm p-6 mb-4">
                         <div className="flex items-center justify-between mb-4">
                             <h2 className="text-xl font-semibold text-gray-800">Today's Progress</h2>
-                            <Target className="h-6 w-6 text-blue-600" />
+                            <div className="text-blue-600 text-2xl"><icons.Target /></div>
                         </div>
                         
                         <div className="mb-6">
@@ -488,7 +501,7 @@
                         <h3 className="text-lg font-semibold text-gray-800 mb-4">Today's Meals</h3>
                         {consumedToday.length === 0 ? (
                             <div className="text-center py-8 text-gray-500">
-                                <Clock className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                                <div className="text-4xl mb-3 text-gray-300"><icons.Clock /></div>
                                 <p>No meals logged yet</p>
                                 <p className="text-sm">Add verified restaurant items from Discover!</p>
                             </div>
@@ -497,7 +510,7 @@
                                 {consumedToday.map((item, index) => (
                                     <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                                         <div className="flex items-center">
-                                            <Shield className="h-4 w-4 text-green-600 mr-3" />
+                                            <div className="text-green-600 mr-3"><icons.Shield /></div>
                                             <div>
                                                 <div className="font-medium text-gray-800">{item.item}</div>
                                                 <div className="text-sm text-gray-600">{item.restaurant} • {item.calories} cal</div>
@@ -507,7 +520,7 @@
                                             onClick={() => removeFromConsumed(index)}
                                             className="p-2 text-red-600 hover:bg-red-100 rounded-full"
                                         >
-                                            <Minus className="h-4 w-4" />
+                                            <icons.Minus />
                                         </button>
                                     </div>
                                 ))}
@@ -521,7 +534,7 @@
                 <div className="pb-20">
                     <div className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl shadow-lg p-6 text-white mb-6">
                         <div className="flex items-center mb-4">
-                            <Crown className="h-8 w-8 mr-3" />
+                            <div className="text-3xl mr-3"><icons.Crown /></div>
                             <h2 className="text-2xl font-bold">Coming Soon!</h2>
                         </div>
                         <p className="mb-6">Mobile app launching with premium features and 500+ local SF restaurants</p>
@@ -539,7 +552,7 @@
                         <div className="bg-white rounded-xl shadow-sm p-6">
                             <div className="flex items-center justify-between mb-3">
                                 <h3 className="text-lg font-semibold">500+ Local SF Restaurants</h3>
-                                <Crown className="h-5 w-5 text-yellow-500" />
+                                <div className="text-yellow-500 text-xl"><icons.Crown /></div>
                             </div>
                             <p className="text-gray-600 mb-4">Verified nutrition data for Tartine, Blue Bottle, La Taqueria, Swan Oyster Depot, and hundreds more local favorites</p>
                             <div className="bg-gray-100 p-3 rounded-lg">
@@ -550,7 +563,7 @@
                         <div className="bg-white rounded-xl shadow-sm p-6">
                             <div className="flex items-center justify-between mb-3">
                                 <h3 className="text-lg font-semibold">Advanced Meal Planning</h3>
-                                <Crown className="h-5 w-5 text-yellow-500" />
+                                <div className="text-yellow-500 text-xl"><icons.Crown /></div>
                             </div>
                             <p className="text-gray-600 mb-4">Plan your entire week with verified calorie data from your favorite restaurants</p>
                         </div>
@@ -558,7 +571,7 @@
                         <div className="bg-white rounded-xl shadow-sm p-6">
                             <div className="flex items-center justify-between mb-3">
                                 <h3 className="text-lg font-semibold">Nutrition Analytics</h3>
-                                <Crown className="h-5 w-5 text-yellow-500" />
+                                <div className="text-yellow-500 text-xl"><icons.Crown /></div>
                             </div>
                             <p className="text-gray-600 mb-4">Detailed insights and trends in your dining habits with exportable reports</p>
                         </div>
@@ -596,7 +609,7 @@
                 <div className="pb-20">
                     <div className="bg-white rounded-xl shadow-sm p-6 mb-4">
                         <div className="flex items-center mb-4">
-                            <Shield className="h-6 w-6 text-blue-600 mr-3" />
+                            <div className="text-blue-600 mr-3 text-2xl"><icons.Shield /></div>
                             <h2 className="text-xl font-semibold text-gray-800">Contact CalorieSpotter</h2>
                         </div>
                         
@@ -611,7 +624,7 @@
                                     Get featured on CalorieSpotter and reach health-conscious diners in your area.
                                 </p>
                                 <button 
-                                    onClick={() => window.open('mailto:partnerships@caloriespotter.com?subject=Restaurant Partnership Inquiry')}
+                                    onClick={() => window.open('mailto:partnerships@caloriespotter.com?subject=Restaurant Partnership Inquiry&body=Hi! I\'m interested in a featured listing for my restaurant on CalorieSpotter.\n\nRestaurant Name:\nLocation:\nWebsite:\n\nPlease send me more details about the $99/month partnership program.\n\nThanks!')}
                                     className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium"
                                 >
                                     Partner With Us - $99/month
@@ -634,23 +647,23 @@
                         <h3 className="text-lg font-semibold text-gray-800 mb-4">Contact & Support</h3>
                         <div className="space-y-3">
                             <button 
-                                onClick={() => window.open('mailto:support@caloriespotter.com')}
+                                onClick={() => window.open('mailto:support@caloriespotter.com?subject=CalorieSpotter Support&body=Hi! I need help with:\n\n')}
                                 className="w-full text-left py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors border"
                             >
                                 📧 support@caloriespotter.com
                             </button>
                             <button 
-                                onClick={() => window.open('mailto:partnerships@caloriespotter.com')}
+                                onClick={() => window.open('mailto:partnerships@caloriespotter.com?subject=Restaurant Partnership&body=Hi! I\'m interested in featuring my restaurant on CalorieSpotter.\n\nRestaurant:\nLocation:\nWebsite:\n\nPlease send partnership details.\n\nThanks!')}
                                 className="w-full text-left py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors border"
                             >
                                 🤝 partnerships@caloriespotter.com
                             </button>
-                            <button className="w-full text-left py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors border">
-                                📄 Privacy Policy
-                            </button>
-                            <button className="w-full text-left py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors border">
-                                📋 Terms of Service
-                            </button>
+                            <div className="w-full text-left py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors border">
+                                📄 Privacy Policy (Coming Soon)
+                            </div>
+                            <div className="w-full text-left py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors border">
+                                📋 Terms of Service (Coming Soon)
+                            </div>
                         </div>
                     </div>
 
@@ -693,18 +706,18 @@
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center">
                                     <div className="bg-gradient-to-r from-blue-600 to-purple-600 w-8 h-8 rounded-full flex items-center justify-center mr-3">
-                                        <Target className="h-5 w-5 text-white" />
+                                        <div className="text-white text-lg"><icons.Target /></div>
                                     </div>
                                     <h1 className="text-xl font-bold text-gray-800">CalorieSpotter</h1>
                                 </div>
                                 <div className="flex items-center space-x-2">
                                     {isPremium && (
                                         <div className="flex items-center bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">
-                                            <Crown className="h-3 w-3 mr-1" />
+                                            <div className="mr-1"><icons.Crown /></div>
                                             <span>Premium</span>
                                         </div>
                                     )}
-                                    <Shield className="h-5 w-5 text-green-600" title="Verified Data Only" />
+                                    <div className="text-green-600" title="Verified Data Only"><icons.Shield /></div>
                                 </div>
                             </div>
                         </div>
