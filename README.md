@@ -1,1 +1,1 @@
-# calorie-spotter
+# LocalPlate
