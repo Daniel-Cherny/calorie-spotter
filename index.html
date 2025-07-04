@@ -98,12 +98,6 @@
             </svg>
         ));
 
-        const X = memo(({ className = "icon" }) => (
-            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-        ));
-
         // Restaurant data loading hook
         const useRestaurantData = () => {
             const [data, setData] = useState([]);
@@ -113,9 +107,18 @@
             useEffect(() => {
                 const loadData = async () => {
                     try {
-                        // In production, this would fetch from restaurants.json
-                        // For this demo, we'll use a subset of data
-                        const mockData = [
+                        // PRODUCTION VERSION - loads from restaurants.json file
+                        const response = await fetch('./restaurants.json');
+                        if (!response.ok) {
+                            throw new Error('Failed to load restaurant data');
+                        }
+                        const jsonData = await response.json();
+                        setData(jsonData.restaurants);
+                        setLoading(false);
+                    } catch (err) {
+                        // FALLBACK - if restaurants.json doesn't exist, use sample data
+                        console.warn('restaurants.json not found, using sample data:', err.message);
+                        const sampleData = [
                             { id: 1, restaurant: "McDonald's", item: "Big Mac", calories: 580, category: "Burgers", protein: 25, carbs: 46, fat: 33, price: 5.99, distance: 0.3, rating: 3.9, verified: true, source: "McDonald's Official" },
                             { id: 2, restaurant: "McDonald's", item: "Quarter Pounder with Cheese", calories: 520, category: "Burgers", protein: 30, carbs: 40, fat: 26, price: 6.49, distance: 0.3, rating: 3.9, verified: true, source: "McDonald's Official" },
                             { id: 3, restaurant: "Subway", item: "6-inch Turkey Breast", calories: 280, category: "Sandwiches", protein: 18, carbs: 46, fat: 4, price: 6.49, distance: 0.6, rating: 3.8, verified: true, source: "Subway Official" },
@@ -128,12 +131,9 @@
                             { id: 10, restaurant: "True Food Kitchen", item: "Grass-Fed Burger", calories: 660, category: "Burgers", protein: 51, carbs: 40, fat: 35, price: 19.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true }
                         ];
                         
-                        // Simulate API delay
-                        await new Promise(resolve => setTimeout(resolve, 800));
-                        setData(mockData);
-                        setLoading(false);
-                    } catch (err) {
-                        setError(err.message);
+                        // Simulate loading delay
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        setData(sampleData);
                         setLoading(false);
                     }
                 };
@@ -358,7 +358,7 @@
                                             <div className="flex flex-wrap justify-center gap-2 mt-4">
                                                 <button onClick={() => setSearchQuery('coffee')} className="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm hover:bg-blue-200 transition-colors">coffee</button>
                                                 <button onClick={() => setSearchQuery('sandwich')} className="px-3 py-1 bg-green-100 text-green-600 rounded-full text-sm hover:bg-green-200 transition-colors">sandwich</button>
-                                                <button onClick={() => setSearchQuery('low calorie')} className="px-3 py-1 bg-purple-100 text-purple-600 rounded-full text-sm hover:bg-purple-200 transition-colors">low calorie</button>
+                                                <button onClick={() => setSearchQuery('burger')} className="px-3 py-1 bg-purple-100 text-purple-600 rounded-full text-sm hover:bg-purple-200 transition-colors">burger</button>
                                             </div>
                                         </div>
                                     ) : (
