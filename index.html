@@ -108,7 +108,7 @@
                 const loadData = async () => {
                     try {
                         // PRODUCTION VERSION - loads from restaurants.json file
-                        const response = await fetch('./data/restaurants.json');
+                        const response = await fetch('data/restaurants.json');
                         if (!response.ok) {
                             throw new Error('Failed to load restaurant data');
                         }
