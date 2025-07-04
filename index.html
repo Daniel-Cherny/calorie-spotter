@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CalorieSpotter - Restaurant Calorie Finder</title>
+    <title>LocalPlate - Restaurant Calorie Finder</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -398,7 +398,7 @@
             );
         });
 
-        const CalorieSpotterApp = () => {
+        const LocalPlateApp = () => {
             // State
             const [currentView, setCurrentView] = useState('discover');
             const [searchQuery, setSearchQuery] = useState('');
@@ -719,14 +719,14 @@
                     <div className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl shadow-lg p-6 text-white mb-6">
                         <div className="flex items-center mb-4">
                             <Crown className="h-8 w-8 mr-3" />
-                            <h2 className="text-2xl font-bold">CalorieSpotter Premium</h2>
+                            <h2 className="text-2xl font-bold">LocalPlate Premium</h2>
                         </div>
                         <p className="mb-6">Get access to 500+ local SF restaurants with verified nutrition data</p>
                         
                         <button 
                             onClick={() => {
                                 setIsPremium(true);
-                                showToast('🎉 Welcome to CalorieSpotter Premium!', 'success');
+                                showToast('🎉 Welcome to LocalPlate Premium!', 'success');
                             }}
                             className="bg-white text-orange-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
                         >
@@ -800,19 +800,19 @@
                     <div className="bg-white rounded-xl shadow-sm p-6 mb-4">
                         <div className="flex items-center mb-4">
                             <Shield className="h-6 w-6 text-blue-600 mr-3" />
-                            <h2 className="text-xl font-semibold text-gray-800">Contact CalorieSpotter</h2>
+                            <h2 className="text-xl font-semibold text-gray-800">Contact LocalPlate</h2>
                         </div>
                         
                         <div className="space-y-4 text-gray-600">
-                            <p>CalorieSpotter helps you make informed dining choices with verified restaurant nutrition data.</p>
+                            <p>LocalPlate helps you make informed dining choices with verified restaurant nutrition data.</p>
                             
                             <div className="bg-green-50 p-4 rounded-lg">
                                 <h3 className="font-semibold text-green-800 mb-2">For Restaurants</h3>
                                 <p className="text-sm text-green-700 mb-3">
-                                    Get featured on CalorieSpotter and reach health-conscious diners in your area.
+                                    Get featured on LocalPlate and reach health-conscious diners in your area.
                                 </p>
                                 <button 
-                                    onClick={() => window.open('mailto:partnerships@caloriespotter.com?subject=Restaurant Partnership&body=Hi! I\'m interested in featuring my restaurant on CalorieSpotter for $99/month.')}
+                                    onClick={() => window.open('mailto:partnerships@LocalPlate.com?subject=Restaurant Partnership&body=Hi! I\'m interested in featuring my restaurant on LocalPlate for $99/month.')}
                                     className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
                                 >
                                     Partner With Us - $99/month
@@ -825,16 +825,16 @@
                         <h3 className="text-lg font-semibold text-gray-800 mb-4">Contact & Support</h3>
                         <div className="space-y-3">
                             <button 
-                                onClick={() => window.open('mailto:support@caloriespotter.com')}
+                                onClick={() => window.open('mailto:support@LocalPlate.com')}
                                 className="w-full text-left py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors border"
                             >
-                                📧 support@caloriespotter.com
+                                📧 support@LocalPlate.com
                             </button>
                             <button 
-                                onClick={() => window.open('mailto:partnerships@caloriespotter.com')}
+                                onClick={() => window.open('mailto:partnerships@LocalPlate.com')}
                                 className="w-full text-left py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors border"
                             >
-                                🤝 partnerships@caloriespotter.com
+                                🤝 partnerships@LocalPlate.com
                             </button>
                         </div>
                     </div>
@@ -842,7 +842,7 @@
                     <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl shadow-lg p-6 text-white">
                         <h3 className="text-lg font-semibold mb-2">Mobile App Coming Soon!</h3>
                         <p className="text-sm mb-4 opacity-90">
-                            Get notified when CalorieSpotter launches on iOS and Android.
+                            Get notified when LocalPlate launches on iOS and Android.
                         </p>
                         <input
                             type="email"
@@ -874,7 +874,7 @@
                                     <div className="bg-gradient-to-r from-blue-600 to-purple-600 w-8 h-8 rounded-full flex items-center justify-center mr-3">
                                         <Target className="h-5 w-5 text-white" />
                                     </div>
-                                    <h1 className="text-xl font-bold text-gray-800">CalorieSpotter</h1>
+                                    <h1 className="text-xl font-bold text-gray-800">LocalPlate</h1>
                                 </div>
                                 <div className="flex items-center space-x-2">
                                     {isPremium && (
@@ -903,7 +903,7 @@
             );
         };
 
-        ReactDOM.render(<CalorieSpotterApp />, document.getElementById('root'));
+        ReactDOM.render(<LocalPlateApp />, document.getElementById('root'));
     </script>
 </body>
 </html>
