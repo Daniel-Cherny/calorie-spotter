@@ -135,7 +135,7 @@
             return { data, loading, error };
         };
 
-        const FilterPanel = memo(({ filters, setFilters, restaurantData }) => {
+        const FilterPanel = memo(({ filters, setFilters, restaurantData, isPremium, onUpgradeClick }) => {
             const maxCal = useMemo(() => Math.max(...restaurantData.map(i => i.calories), 1200), [restaurantData]);
 
             const handleFilterChange = (key, value) => {
@@ -143,6 +143,10 @@
             };
 
             const handleToggle = (key) => {
+                if (key === 'isLocal' && !isPremium) {
+                    onUpgradeClick();
+                    return;
+                }
                 setFilters(prev => ({ ...prev, [key]: !prev[key] }));
             }
 
@@ -179,9 +183,10 @@
                         </div>
 
                         <div className="flex items-center space-x-4">
-                            <label className="flex items-center cursor-pointer">
-                                <input type="checkbox" checked={filters.isLocal} onChange={() => handleToggle('isLocal')} className="h-4 w-4 rounded text-blue-600 focus:ring-blue-500" />
-                                <span className="ml-2 text-sm text-gray-700">Local SF Only</span>
+                            <label className={`flex items-center ${!isPremium ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
+                                <input type="checkbox" checked={filters.isLocal} onChange={() => handleToggle('isLocal')} className={`h-4 w-4 rounded ${!isPremium ? 'text-gray-400' : 'text-blue-600 focus:ring-blue-500'}`} disabled={!isPremium} />
+                                <span className={`ml-2 text-sm ${!isPremium ? 'text-gray-400' : 'text-gray-700'}`}>Local SF Only</span>
+                                {!isPremium && <Crown className="h-4 w-4 ml-1 text-yellow-500" />}
                             </label>
                             <label className="flex items-center cursor-pointer">
                                 <input type="checkbox" checked={filters.seedOilFree} onChange={() => handleToggle('seedOilFree')} className="h-4 w-4 rounded text-green-600 focus:ring-green-500" />
@@ -296,6 +301,20 @@
             );
         });
 
+        const UpgradePrompt = ({ onUpgradeClick }) => (
+            <div className="bg-white rounded-xl shadow-sm p-6 text-center fade-in">
+                <Crown className="h-10 w-10 mx-auto text-yellow-500 mb-3" />
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">Unlock Local SF Restaurants</h3>
+                <p className="text-gray-600 mb-4">Get access to hundreds of local SF favorites by upgrading to Premium.</p>
+                <button
+                    onClick={onUpgradeClick}
+                    className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-5 py-2 rounded-lg font-semibold hover:opacity-90 transition-opacity"
+                >
+                    Go Premium
+                </button>
+            </div>
+        );
+
         const LoadingCard = memo(() => (
             <div className="bg-white rounded-xl shadow-sm p-4 mb-3">
                 <div className="loading">
@@ -328,6 +347,11 @@
             const filteredRestaurants = useMemo(() => {
                 let results = [...restaurantData];
 
+                // Premium content lock
+                if (!isPremium) {
+                    results = results.filter(item => !item.isLocal);
+                }
+
                 if (searchQuery.trim()) {
                     const query = searchQuery.toLowerCase().trim();
                     results = results.filter(item => 
@@ -339,7 +363,9 @@
 
                 // Apply filters
                 results = results.filter(item => item.calories <= filters.maxCalories);
-                if (filters.isLocal) results = results.filter(item => item.isLocal);
+                if (filters.isLocal && isPremium) {
+                    results = results.filter(item => item.isLocal);
+                }
                 if (filters.seedOilFree) results = results.filter(item => item.seedOilFree);
 
                 // Apply sorting
@@ -355,15 +381,15 @@
                 });
 
                 return sortedResults;
-            }, [searchQuery, restaurantData, filters]);
+            }, [searchQuery, restaurantData, filters, isPremium]);
             
             const activeFilterCount = useMemo(() => {
                 let count = 0;
                 if (filters.maxCalories < 1200) count++;
-                if (filters.isLocal) count++;
+                if (filters.isLocal && isPremium) count++;
                 if (filters.seedOilFree) count++;
                 return count;
-            }, [filters]);
+            }, [filters, isPremium]);
 
             const handleSearchChange = useCallback((value) => setSearchQuery(value), []);
 
@@ -385,6 +411,11 @@
                         : [...prev, item]
                 );
             }, [favorites]);
+            
+            const handleUpgrade = () => {
+                setIsPremium(true);
+                setCurrentView('discover');
+            };
 
             if (error) {
                 return (
@@ -436,7 +467,13 @@
                                     filterCount={activeFilterCount}
                                 />
                                 <div className={`filter-panel ${showFilters ? 'open' : ''}`}>{
-                                    !loading && <FilterPanel filters={filters} setFilters={setFilters} restaurantData={restaurantData} />
+                                    !loading && <FilterPanel 
+                                        filters={filters} 
+                                        setFilters={setFilters} 
+                                        restaurantData={restaurantData}
+                                        isPremium={isPremium}
+                                        onUpgradeClick={() => setCurrentView('premium')}
+                                    />
                                 }</div>
                                 <div className="space-y-3">
                                     {loading ? (
@@ -445,18 +482,21 @@
                                         <div className="text-center py-12 text-gray-500 fade-in">
                                             <div className="text-6xl mb-4 animate-bounce">🔍</div>
                                             <h3 className="text-lg font-medium mb-2">No restaurants found</h3>
-                                            <p className="text-sm mb-4">Try adjusting your search or filters</p>
+                                            <p className="text-sm mb-4">Try adjusting your search or filters.</p>
                                         </div>
                                     ) : (
-                                        filteredRestaurants.map((item) => (
-                                            <RestaurantCard
-                                                key={item.id}
-                                                item={item}
-                                                onAddToFavorites={toggleFavorite}
-                                                onAddToTracking={addToConsumed}
-                                                isFavorited={favorites.some(fav => fav.id === item.id)}
-                                            />
-                                        ))
+                                        <>
+                                            {filteredRestaurants.map((item) => (
+                                                <RestaurantCard
+                                                    key={item.id}
+                                                    item={item}
+                                                    onAddToFavorites={toggleFavorite}
+                                                    onAddToTracking={addToConsumed}
+                                                    isFavorited={favorites.some(fav => fav.id === item.id)}
+                                                />
+                                            ))}
+                                            {!isPremium && <UpgradePrompt onUpgradeClick={() => setCurrentView('premium')} />}
+                                        </>
                                     )}
                                 </div>
                             </div>
@@ -535,30 +575,28 @@
                         
                         {currentView === 'premium' && (
                             <div className="pb-20">
-                                <div className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl shadow-lg p-6 text-white mb-6">
-                                    <div className="flex items-center mb-4">
-                                        <Crown className="h-8 w-8 mr-3" />
-                                        <h2 className="text-2xl font-bold">LocalPlate Premium</h2>
+                                {isPremium ? (
+                                    <div className="bg-white rounded-xl shadow-sm p-8 text-center">
+                                        <Crown className="h-12 w-12 mx-auto text-yellow-500 mb-4" />
+                                        <h2 className="text-2xl font-bold text-gray-800 mb-2">You are a Premium Member!</h2>
+                                        <p className="text-gray-600">You now have access to all local SF restaurants.</p>
                                     </div>
-                                    <p className="mb-6">Get access to 500+ local SF restaurants with verified nutrition data</p>
-                                    
-                                    <button 
-                                        onClick={() => setIsPremium(true)}
-                                        className="bg-white text-orange-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
-                                    >
-                                        Start Free Trial - $4.99/month
-                                    </button>
-                                </div>
-
-                                <div className="space-y-4">
-                                    <div className="bg-white rounded-xl shadow-sm p-6">
-                                        <h3 className="text-lg font-semibold mb-3">500+ Local SF Restaurants</h3>
-                                        <p className="text-gray-600 mb-4">Verified nutrition data for Tartine, Blue Bottle, La Taqueria, and hundreds more local favorites</p>
-                                        <button className="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg text-sm font-medium">
-                                            Browse Local Restaurants
+                                ) : (
+                                    <div className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl shadow-lg p-6 text-white mb-6">
+                                        <div className="flex items-center mb-4">
+                                            <Crown className="h-8 w-8 mr-3" />
+                                            <h2 className="text-2xl font-bold">LocalPlate Premium</h2>
+                                        </div>
+                                        <p className="mb-6">Get access to 500+ local SF restaurants with verified nutrition data</p>
+                                        
+                                        <button 
+                                            onClick={handleUpgrade}
+                                            className="w-full bg-white text-orange-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+                                        >
+                                            Start Free Trial - $4.99/month
                                         </button>
                                     </div>
-                                </div>
+                                )}
                             </div>
                         )}
 
