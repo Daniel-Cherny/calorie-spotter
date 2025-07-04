@@ -9,48 +9,19 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .icon {
-            width: 20px;
-            height: 20px;
-            display: inline-block;
-        }
-        .icon-sm {
-            width: 16px;
-            height: 16px;
-        }
-        /* Prevent search input from losing focus */
-        .search-input {
-            outline: none !important;
-        }
-        .search-input:focus {
-            outline: none !important;
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5) !important;
-        }
-        .restaurant-card { 
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-            transform: translateY(0);
-        }
-        .restaurant-card:hover { 
-            transform: translateY(-4px); 
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
-        .fade-in {
-            animation: fadeIn 0.4s ease-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .nav-item {
-            transition: all 0.3s ease;
-        }
-        .nav-item.active {
-            color: #3b82f6;
-            transform: translateY(-2px);
-        }
-        .progress-bar {
-            transition: width 0.5s ease;
-        }
+        .icon { width: 20px; height: 20px; display: inline-block; }
+        .icon-sm { width: 16px; height: 16px; }
+        .search-input { outline: none !important; }
+        .search-input:focus { outline: none !important; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5) !important; }
+        .restaurant-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); transform: translateY(0); }
+        .restaurant-card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .nav-item { transition: all 0.3s ease; }
+        .nav-item.active { color: #3b82f6; transform: translateY(-2px); }
+        .progress-bar { transition: width 0.5s ease; }
+        .loading { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
     </style>
 </head>
 <body>
@@ -59,7 +30,7 @@
     <script type="text/babel">
         const { useState, useMemo, useRef, useEffect, useCallback, memo } = React;
 
-        // Simple SVG icons - memoized to prevent re-creation
+        // Icons (keeping these inline for simplicity)
         const Search = memo(({ className = "icon" }) => (
             <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m21 21-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -133,189 +104,65 @@
             </svg>
         ));
 
-        // Restaurant data - kept outside component to prevent re-creation
-        const RESTAURANT_DATA = [
-            // McDonald's
-            { id: 1, restaurant: "McDonald's", item: "Big Mac", calories: 580, category: "Burgers", protein: 25, carbs: 46, fat: 33, price: 5.99, distance: 0.3, rating: 3.9, verified: true, source: "McDonald's Official" },
-            { id: 2, restaurant: "McDonald's", item: "Quarter Pounder with Cheese", calories: 520, category: "Burgers", protein: 30, carbs: 40, fat: 26, price: 6.49, distance: 0.3, rating: 3.9, verified: true, source: "McDonald's Official" },
-            { id: 3, restaurant: "McDonald's", item: "Chicken McNuggets (10 piece)", calories: 440, category: "Chicken", protein: 24, carbs: 27, fat: 27, price: 4.89, distance: 0.3, rating: 3.9, verified: true, source: "McDonald's Official" },
-            { id: 4, restaurant: "McDonald's", item: "Large Fries", calories: 510, category: "Sides", protein: 6, carbs: 66, fat: 24, price: 3.79, distance: 0.3, rating: 3.9, verified: true, source: "McDonald's Official" },
-            
-            // Subway
-            { id: 5, restaurant: "Subway", item: "6-inch Turkey Breast", calories: 280, category: "Sandwiches", protein: 18, carbs: 46, fat: 4, price: 6.49, distance: 0.6, rating: 3.8, verified: true, source: "Subway Official" },
-            { id: 6, restaurant: "Subway", item: "6-inch Italian B.M.T.", calories: 410, category: "Sandwiches", protein: 19, carbs: 44, fat: 16, price: 7.49, distance: 0.6, rating: 3.8, verified: true, source: "Subway Official" },
-            
-            // Starbucks
-            { id: 7, restaurant: "Starbucks", item: "Grande Caffe Latte", calories: 190, category: "Beverages", protein: 13, carbs: 18, fat: 7, price: 5.25, distance: 0.1, rating: 4.1, verified: true, source: "Starbucks Official" },
-            { id: 8, restaurant: "Starbucks", item: "Grande Vanilla Latte", calories: 250, category: "Beverages", protein: 12, carbs: 37, fat: 6, price: 5.65, distance: 0.1, rating: 4.1, verified: true, source: "Starbucks Official" },
-            
-            // Chipotle
-            { id: 9, restaurant: "Chipotle", item: "Chicken Bowl (Basic)", calories: 510, category: "Bowls", protein: 45, carbs: 40, fat: 17, price: 9.65, distance: 0.5, rating: 4.2, verified: true, source: "Chipotle Official" },
-            { id: 10, restaurant: "Chipotle", item: "Chicken Bowl (Loaded)", calories: 820, category: "Bowls", protein: 47, carbs: 62, fat: 35, price: 12.65, distance: 0.5, rating: 4.2, verified: true, source: "Chipotle Official" },
-            
-            // Taco Bell
-            { id: 11, restaurant: "Taco Bell", item: "Crunchy Taco Supreme", calories: 190, category: "Tacos", protein: 8, carbs: 15, fat: 11, price: 2.49, distance: 0.8, rating: 3.7, verified: true, source: "Taco Bell Official" },
-            { id: 12, restaurant: "Taco Bell", item: "Chicken Quesadilla", calories: 520, category: "Quesadillas", protein: 27, carbs: 39, fat: 28, price: 5.49, distance: 0.8, rating: 3.7, verified: true, source: "Taco Bell Official" },
-            
-            // Upfordayz - Local SF (from official menu)
-            // Coffee
-            { id: 13, restaurant: "Upfordayz", item: "Espresso", calories: 5, category: "Coffee", protein: 0, carbs: 1, fat: 0, price: 4.00, distance: 0.7, rating: 4.5, verified: true, source: "Official Menu", isLocal: true },
-            { id: 14, restaurant: "Upfordayz", item: "Latte (8 oz)", calories: 120, category: "Coffee", protein: 8, carbs: 12, fat: 6, price: 4.90, distance: 0.7, rating: 4.5, verified: true, source: "Official Menu", isLocal: true },
-            { id: 15, restaurant: "Upfordayz", item: "Cappuccino (8 oz)", calories: 80, category: "Coffee", protein: 4, carbs: 8, fat: 4, price: 4.90, distance: 0.7, rating: 4.5, verified: true, source: "Official Menu", isLocal: true },
-            { id: 16, restaurant: "Upfordayz", item: "Americano (8 oz)", calories: 10, category: "Coffee", protein: 1, carbs: 2, fat: 0, price: 4.15, distance: 0.7, rating: 4.5, verified: true, source: "Official Menu", isLocal: true },
-            { id: 17, restaurant: "Upfordayz", item: "Mocha (8 oz)", calories: 180, category: "Coffee", protein: 8, carbs: 24, fat: 7, price: 5.25, distance: 0.7, rating: 4.5, verified: true, source: "Official Menu", isLocal: true },
-            // Tea
-            { id: 18, restaurant: "Upfordayz", item: "White Blueberry Tea", calories: 5, category: "Tea", protein: 0, carbs: 1, fat: 0, price: 4.95, distance: 0.7, rating: 4.5, verified: true, source: "Official Menu", isLocal: true },
-            { id: 19, restaurant: "Upfordayz", item: "Black Tea", calories: 2, category: "Tea", protein: 0, carbs: 0, fat: 0, price: 4.95, distance: 0.7, rating: 4.5, verified: true, source: "Official Menu", isLocal: true },
-            { id: 20, restaurant: "Upfordayz", item: "Green Tea", calories: 2, category: "Tea", protein: 0, carbs: 0, fat: 0, price: 5.25, distance: 0.7, rating: 4.5, verified: true, source: "Official Menu", isLocal: true },
-            { id: 21, restaurant: "Upfordayz", item: "Matcha Latte", calories: 140, category: "Tea", protein: 6, carbs: 18, fat: 5, price: 6.15, distance: 0.7, rating: 4.5, verified: true, source: "Official Menu", isLocal: true },
-            { id: 22, restaurant: "Upfordayz", item: "Chai Latte", calories: 180, category: "Tea", protein: 6, carbs: 32, fat: 4, price: 5.25, distance: 0.7, rating: 4.5, verified: true, source: "Official Menu", isLocal: true },
-            // Juices & Smoothies
-            { id: 23, restaurant: "Upfordayz", item: "Chocolate Dream Shake", calories: 380, category: "Shakes", protein: 25, carbs: 42, fat: 12, price: 10.95, distance: 0.7, rating: 4.5, verified: true, source: "Official Menu", isLocal: true },
-            { id: 24, restaurant: "Upfordayz", item: "Red Prime Smoothie", calories: 280, category: "Smoothies", protein: 12, carbs: 48, fat: 6, price: 9.95, distance: 0.7, rating: 4.5, verified: true, source: "Official Menu", isLocal: true },
-            { id: 25, restaurant: "Upfordayz", item: "Go Green Juice", calories: 120, category: "Juices", protein: 4, carbs: 28, fat: 1, price: 8.95, distance: 0.7, rating: 4.5, verified: true, source: "Official Menu", isLocal: true },
-            { id: 26, restaurant: "Upfordayz", item: "Why Ginger Juice", calories: 90, category: "Juices", protein: 2, carbs: 22, fat: 0, price: 8.95, distance: 0.7, rating: 4.5, verified: true, source: "Official Menu", isLocal: true },
-            { id: 27, restaurant: "Upfordayz", item: "Orange Shot", calories: 25, category: "Shots", protein: 1, carbs: 6, fat: 0, price: 4.50, distance: 0.7, rating: 4.5, verified: true, source: "Official Menu", isLocal: true },
-            // Food
-            { id: 28, restaurant: "Upfordayz", item: "Egg Sandwich", calories: 420, category: "Breakfast", protein: 22, carbs: 35, fat: 22, price: 10.50, distance: 0.7, rating: 4.5, verified: true, source: "Official Menu", isLocal: true },
-            { id: 29, restaurant: "Upfordayz", item: "Wellness Sandwich", calories: 380, category: "Breakfast", protein: 18, carbs: 42, fat: 16, price: 11.95, distance: 0.7, rating: 4.5, verified: true, source: "Official Menu", isLocal: true },
-            { id: 30, restaurant: "Upfordayz", item: "Pancake's Favorite", calories: 520, category: "Breakfast", protein: 12, carbs: 68, fat: 22, price: 13.50, distance: 0.7, rating: 4.5, verified: true, source: "Official Menu", isLocal: true },
-            { id: 31, restaurant: "Upfordayz", item: "Yogurt Bowl", calories: 320, category: "Breakfast", protein: 15, carbs: 48, fat: 8, price: 12.50, distance: 0.7, rating: 4.5, verified: true, source: "Official Menu", isLocal: true },
-            { id: 32, restaurant: "Upfordayz", item: "Eat With Purpose Bowl", calories: 450, category: "Bowls", protein: 18, carbs: 52, fat: 20, price: 12.95, distance: 0.7, rating: 4.5, verified: true, source: "Official Menu", isLocal: true },
+        // Restaurant data loading hook
+        const useRestaurantData = () => {
+            const [data, setData] = useState([]);
+            const [loading, setLoading] = useState(true);
+            const [error, setError] = useState(null);
 
-            // Peasant Pies - Local SF
-            { id: 33, restaurant: "Peasant Pies", item: "Beef & Potato Pie", calories: 530, category: "Savory Pies", protein: 18, carbs: 46, fat: 30, price: 12.95, distance: 1.1, rating: 4.3, verified: true, source: "Official Menu", isLocal: true },
-            { id: 34, restaurant: "Peasant Pies", item: "Chicken & Potato Pie", calories: 290, category: "Savory Pies", protein: 10, carbs: 51, fat: 5, price: 11.95, distance: 1.1, rating: 4.3, verified: true, source: "Official Menu", isLocal: true },
-            { id: 35, restaurant: "Peasant Pies", item: "Ham, Eggs & Cheese Pie", calories: 400, category: "Breakfast Pies", protein: 20, carbs: 38, fat: 18, price: 10.95, distance: 1.1, rating: 4.3, verified: true, source: "Official Menu", isLocal: true },
-            { id: 36, restaurant: "Peasant Pies", item: "Spinach & Feta Cheese Pie", calories: 340, category: "Vegetarian Pies", protein: 18, carbs: 39, fat: 13, price: 9.95, distance: 1.1, rating: 4.3, verified: true, source: "Official Menu", isLocal: true },
-            { id: 37, restaurant: "Peasant Pies", item: "Garbanzo Bean Curry Pie", calories: 270, category: "Vegan Pies", protein: 10, carbs: 52, fat: 2.5, price: 9.95, distance: 1.1, rating: 4.3, verified: true, source: "Official Menu", isLocal: true },
+            useEffect(() => {
+                const loadData = async () => {
+                    try {
+                        // In production, this would fetch from restaurants.json
+                        // For this demo, we'll use a subset of data
+                        const mockData = [
+                            { id: 1, restaurant: "McDonald's", item: "Big Mac", calories: 580, category: "Burgers", protein: 25, carbs: 46, fat: 33, price: 5.99, distance: 0.3, rating: 3.9, verified: true, source: "McDonald's Official" },
+                            { id: 2, restaurant: "McDonald's", item: "Quarter Pounder with Cheese", calories: 520, category: "Burgers", protein: 30, carbs: 40, fat: 26, price: 6.49, distance: 0.3, rating: 3.9, verified: true, source: "McDonald's Official" },
+                            { id: 3, restaurant: "Subway", item: "6-inch Turkey Breast", calories: 280, category: "Sandwiches", protein: 18, carbs: 46, fat: 4, price: 6.49, distance: 0.6, rating: 3.8, verified: true, source: "Subway Official" },
+                            { id: 4, restaurant: "Starbucks", item: "Grande Caffe Latte", calories: 190, category: "Beverages", protein: 13, carbs: 18, fat: 7, price: 5.25, distance: 0.1, rating: 4.1, verified: true, source: "Starbucks Official" },
+                            { id: 5, restaurant: "Chipotle", item: "Chicken Bowl (Basic)", calories: 510, category: "Bowls", protein: 45, carbs: 40, fat: 17, price: 9.65, distance: 0.5, rating: 4.2, verified: true, source: "Chipotle Official" },
+                            { id: 6, restaurant: "Upfordayz", item: "Espresso", calories: 5, category: "Coffee", protein: 0, carbs: 1, fat: 0, price: 4.00, distance: 0.7, rating: 4.5, verified: true, source: "Official Menu", isLocal: true },
+                            { id: 7, restaurant: "Upfordayz", item: "Latte (8 oz)", calories: 120, category: "Coffee", protein: 8, carbs: 12, fat: 6, price: 4.90, distance: 0.7, rating: 4.5, verified: true, source: "Official Menu", isLocal: true },
+                            { id: 8, restaurant: "Sweetgreen", item: "Harvest Bowl", calories: 740, category: "Bowls", protein: 32, carbs: 60, fat: 41, price: 15.95, distance: 0.4, rating: 4.4, verified: true, source: "Official Website", isLocal: true },
+                            { id: 9, restaurant: "Souvla", item: "Pork Shoulder Sandwich", calories: 557, category: "Sandwiches", protein: 36, carbs: 29, fat: 33, price: 16.95, distance: 0.6, rating: 4.5, verified: true, source: "Official Nutrition PDF", isLocal: true },
+                            { id: 10, restaurant: "True Food Kitchen", item: "Grass-Fed Burger", calories: 660, category: "Burgers", protein: 51, carbs: 40, fat: 35, price: 19.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true }
+                        ];
+                        
+                        // Simulate API delay
+                        await new Promise(resolve => setTimeout(resolve, 800));
+                        setData(mockData);
+                        setLoading(false);
+                    } catch (err) {
+                        setError(err.message);
+                        setLoading(false);
+                    }
+                };
 
-            // Trailer Birds Hot Chicken - Local SF
-            { id: 38, restaurant: "Trailer Birds", item: "Hot Chicken Sandwich", calories: 860, category: "Sandwiches", protein: 45, carbs: 65, fat: 38, price: 13.95, distance: 0.9, rating: 4.6, verified: true, source: "Official Menu", isLocal: true },
-            { id: 39, restaurant: "Trailer Birds", item: "3 Hot Tenders", calories: 470, category: "Chicken", protein: 35, carbs: 25, fat: 28, price: 9.95, distance: 0.9, rating: 4.6, verified: true, source: "Official Menu", isLocal: true },
-            { id: 40, restaurant: "Trailer Birds", item: "6 Hot Tenders", calories: 890, category: "Chicken", protein: 65, carbs: 45, fat: 52, price: 16.95, distance: 0.9, rating: 4.6, verified: true, source: "Official Menu", isLocal: true },
-            { id: 41, restaurant: "Trailer Birds", item: "Seasoned Crispy Tots", calories: 350, category: "Sides", protein: 5, carbs: 48, fat: 16, price: 6.95, distance: 0.9, rating: 4.6, verified: true, source: "Official Menu", isLocal: true },
-            { id: 42, restaurant: "Trailer Birds", item: "Hand-Cut Fries", calories: 240, category: "Sides", protein: 4, carbs: 35, fat: 10, price: 5.95, distance: 0.9, rating: 4.6, verified: true, source: "Official Menu", isLocal: true },
+                loadData();
+            }, []);
 
-            // Sweetgreen - Chain (Premium Content)
-            { id: 43, restaurant: "Sweetgreen", item: "Harvest Bowl", calories: 740, category: "Bowls", protein: 32, carbs: 60, fat: 41, price: 15.95, distance: 0.4, rating: 4.4, verified: true, source: "Official Website", isLocal: true },
-            { id: 44, restaurant: "Sweetgreen", item: "Kale Caesar", calories: 490, category: "Salads", protein: 35, carbs: 14, fat: 32, price: 14.95, distance: 0.4, rating: 4.4, verified: true, source: "Official Website", isLocal: true },
-            { id: 45, restaurant: "Sweetgreen", item: "Crispy Rice Bowl", calories: 640, category: "Bowls", protein: 28, carbs: 61, fat: 30, price: 15.95, distance: 0.4, rating: 4.4, verified: true, source: "Official Website", isLocal: true },
-            { id: 46, restaurant: "Sweetgreen", item: "Guacamole Greens", calories: 555, category: "Salads", protein: 23, carbs: 35, fat: 33, price: 14.95, distance: 0.4, rating: 4.4, verified: true, source: "Official Website", isLocal: true },
-            { id: 47, restaurant: "Sweetgreen", item: "Chicken Pesto Parm", calories: 525, category: "Bowls", protein: 35, carbs: 38, fat: 23, price: 15.95, distance: 0.4, rating: 4.4, verified: true, source: "Official Website", isLocal: true },
-            { id: 48, restaurant: "Sweetgreen", item: "Steakhouse Chopped", calories: 725, category: "Bowls", protein: 38, carbs: 35, fat: 46, price: 17.95, distance: 0.4, rating: 4.4, verified: true, source: "Official Website", isLocal: true },
-            { id: 49, restaurant: "Sweetgreen", item: "Caramelized Garlic Steak", calories: 770, category: "Protein Plates", protein: 33, carbs: 82, fat: 31, price: 18.20, distance: 0.4, rating: 4.4, verified: true, source: "Official Website", isLocal: true },
-            { id: 50, restaurant: "Sweetgreen", item: "Hot Honey Chicken", calories: 840, category: "Protein Plates", protein: 42, carbs: 74, fat: 40, price: 16.95, distance: 0.4, rating: 4.4, verified: true, source: "Official Website", isLocal: true },
-            { id: 51, restaurant: "Sweetgreen", item: "Miso Glazed Salmon", calories: 930, category: "Protein Plates", protein: 35, carbs: 88, fat: 48, price: 19.95, distance: 0.4, rating: 4.4, verified: true, source: "Official Website", isLocal: true },
-            { id: 52, restaurant: "Sweetgreen", item: "Shroomami (Vegan)", calories: 635, category: "Bowls", protein: 18, carbs: 50, fat: 42, price: 14.95, distance: 0.4, rating: 4.4, verified: true, source: "Official Website", isLocal: true },
+            return { data, loading, error };
+        };
 
-            // Souvla - Local SF Greek (Premium Content)
-            { id: 53, restaurant: "Souvla", item: "Pork Shoulder Sandwich", calories: 557, category: "Sandwiches", protein: 36, carbs: 29, fat: 33, price: 16.95, distance: 0.6, rating: 4.5, verified: true, source: "Official Nutrition PDF", isLocal: true },
-            { id: 54, restaurant: "Souvla", item: "Free Range Chicken Sandwich", calories: 590, category: "Sandwiches", protein: 44, carbs: 36, fat: 30, price: 17.95, distance: 0.6, rating: 4.5, verified: true, source: "Official Nutrition PDF", isLocal: true },
-            { id: 55, restaurant: "Souvla", item: "Lamb Leg Sandwich", calories: 527, category: "Sandwiches", protein: 42, carbs: 29, fat: 27, price: 18.95, distance: 0.6, rating: 4.5, verified: true, source: "Official Nutrition PDF", isLocal: true },
-            { id: 56, restaurant: "Souvla", item: "Roasted Sweet Potato Sandwich", calories: 409, category: "Sandwiches", protein: 9, carbs: 55, fat: 17, price: 14.95, distance: 0.6, rating: 4.5, verified: true, source: "Official Nutrition PDF", isLocal: true },
-            { id: 57, restaurant: "Souvla", item: "Pork Shoulder Salad", calories: 511, category: "Salads", protein: 33, carbs: 7, fat: 39, price: 16.95, distance: 0.6, rating: 4.5, verified: true, source: "Official Nutrition PDF", isLocal: true },
-            { id: 58, restaurant: "Souvla", item: "Free Range Chicken Salad", calories: 516, category: "Salads", protein: 40, carbs: 8, fat: 36, price: 17.95, distance: 0.6, rating: 4.5, verified: true, source: "Official Nutrition PDF", isLocal: true },
-            { id: 59, restaurant: "Souvla", item: "Lamb Leg Salad", calories: 477, category: "Salads", protein: 39, carbs: 6, fat: 33, price: 18.95, distance: 0.6, rating: 4.5, verified: true, source: "Official Nutrition PDF", isLocal: true },
-            { id: 60, restaurant: "Souvla", item: "Roasted Sweet Potato Salad", calories: 331, category: "Salads", protein: 5, carbs: 26, fat: 23, price: 14.95, distance: 0.6, rating: 4.5, verified: true, source: "Official Nutrition PDF", isLocal: true },
-            { id: 61, restaurant: "Souvla", item: "Greek Frozen Yogurt (Plain)", calories: 224, category: "Desserts", protein: 7, carbs: 37, fat: 6, price: 8.95, distance: 0.6, rating: 4.5, verified: true, source: "Official Nutrition PDF", isLocal: true },
-            { id: 62, restaurant: "Souvla", item: "Baklava Frozen Yogurt", calories: 555, category: "Desserts", protein: 12, carbs: 66, fat: 29, price: 11.95, distance: 0.6, rating: 4.5, verified: true, source: "Official Nutrition PDF", isLocal: true },
-            { id: 63, restaurant: "Souvla", item: "Greek Side Salad", calories: 128, category: "Sides", protein: 2, carbs: 3, fat: 12, price: 7.95, distance: 0.6, rating: 4.5, verified: true, source: "Official Nutrition PDF", isLocal: true },
-            { id: 64, restaurant: "Souvla", item: "Juicy Potatoes", calories: 173, category: "Sides", protein: 1, carbs: 13, fat: 13, price: 6.95, distance: 0.6, rating: 4.5, verified: true, source: "Official Nutrition PDF", isLocal: true },
-
-            // True Food Kitchen - Premium Local Health Food (Official Nutrition Data) - 100% SEED OIL FREE
-            // Starters
-            { id: 65, restaurant: "True Food Kitchen", item: "Mediterranean Hummus", calories: 930, category: "Starters", protein: 24, carbs: 53, fat: 57, price: 16.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true, seedOilFree: true },
-            { id: 66, restaurant: "True Food Kitchen", item: "Charred Cauliflower", calories: 340, category: "Starters", protein: 9, carbs: 25, fat: 25, price: 14.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true, seedOilFree: true },
-            { id: 67, restaurant: "True Food Kitchen", item: "Edamame Dumplings", calories: 270, category: "Starters", protein: 12, carbs: 25, fat: 15, price: 13.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true, seedOilFree: true },
-            { id: 68, restaurant: "True Food Kitchen", item: "Roasted Brussels Sprouts", calories: 250, category: "Starters", protein: 9, carbs: 34, fat: 23, price: 12.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true, seedOilFree: true },
-            { id: 69, restaurant: "True Food Kitchen", item: "Grass-Fed Meatloaf Sliders", calories: 770, category: "Starters", protein: 39, carbs: 37, fat: 53, price: 18.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true, seedOilFree: true },
-            
-            // Soups
-            { id: 70, restaurant: "True Food Kitchen", item: "Roasted Butternut Squash Soup (Cup)", calories: 120, category: "Soups", protein: 1, carbs: 23, fat: 4, price: 8.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            { id: 71, restaurant: "True Food Kitchen", item: "Roasted Butternut Squash Soup (Bowl)", calories: 260, category: "Soups", protein: 2, carbs: 45, fat: 7, price: 12.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            
-            // Pizzas
-            { id: 72, restaurant: "True Food Kitchen", item: "Pepperoni Pizza", calories: 1020, category: "Pizzas", protein: 43, carbs: 129, fat: 34, price: 21.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            { id: 73, restaurant: "True Food Kitchen", item: "Margherita Pizza", calories: 920, category: "Pizzas", protein: 37, carbs: 129, fat: 26, price: 19.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            { id: 74, restaurant: "True Food Kitchen", item: "Seasonal Roasted Butternut Squash Pizza", calories: 1000, category: "Pizzas", protein: 27, carbs: 149, fat: 39, price: 20.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            
-            // Burgers
-            { id: 75, restaurant: "True Food Kitchen", item: "Grass-Fed Burger", calories: 660, category: "Burgers", protein: 51, carbs: 40, fat: 35, price: 19.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            { id: 76, restaurant: "True Food Kitchen", item: "Turkey Burger", calories: 600, category: "Burgers", protein: 43, carbs: 36, fat: 32, price: 18.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            { id: 77, restaurant: "True Food Kitchen", item: "Plant-Based Double Cheeseburger", calories: 750, category: "Burgers", protein: 20, carbs: 72, fat: 44, price: 18.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            { id: 78, restaurant: "True Food Kitchen", item: "All-American Burger", calories: 720, category: "Burgers", protein: 52, carbs: 39, fat: 41, price: 20.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            
-            // Sandwiches & True Crisp'd Chicken
-            { id: 79, restaurant: "True Food Kitchen", item: "True Crisp'd TFK Classic Chicken Sandwich", calories: 830, category: "Sandwiches", protein: 39, carbs: 84, fat: 31, price: 18.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            { id: 80, restaurant: "True Food Kitchen", item: "Buffalo Chicken Sandwich", calories: 1090, category: "Sandwiches", protein: 42, carbs: 111, fat: 50, price: 19.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            { id: 81, restaurant: "True Food Kitchen", item: "True Crisp'd Buffalo Tenders", calories: 780, category: "True Crisp'd Chicken", protein: 53, carbs: 40, fat: 43, price: 17.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            
-            // Salads & Bowls
-            { id: 82, restaurant: "True Food Kitchen", item: "Crisp'd Green Salad", calories: 780, category: "Salads", protein: 37, carbs: 36, fat: 54, price: 17.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            { id: 83, restaurant: "True Food Kitchen", item: "SZA CZA Salad", calories: 570, category: "Salads", protein: 17, carbs: 41, fat: 39, price: 16.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            { id: 84, restaurant: "True Food Kitchen", item: "Chopped Salad", calories: 600, category: "Salads", protein: 13, carbs: 64, fat: 34, price: 17.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            { id: 85, restaurant: "True Food Kitchen", item: "Organic Tuscan Kale Salad", calories: 370, category: "Salads", protein: 7, carbs: 13, fat: 33, price: 15.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            { id: 86, restaurant: "True Food Kitchen", item: "Chinese Chicken Salad", calories: 700, category: "Salads", protein: 36, carbs: 35, fat: 48, price: 18.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            { id: 87, restaurant: "True Food Kitchen", item: "Seasonal Market Salad", calories: 600, category: "Salads", protein: 11, carbs: 27, fat: 52, price: 16.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            { id: 88, restaurant: "True Food Kitchen", item: "Spicy Panang Curry Bowl", calories: 700, category: "Bowls", protein: 10, carbs: 121, fat: 21, price: 18.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            { id: 89, restaurant: "True Food Kitchen", item: "Ancient Grains Bowl", calories: 560, category: "Bowls", protein: 12, carbs: 57, fat: 34, price: 17.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            { id: 90, restaurant: "True Food Kitchen", item: "Wild-Caught Tuna Poke Bowl", calories: 500, category: "Bowls", protein: 32, carbs: 56, fat: 18, price: 22.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            { id: 91, restaurant: "True Food Kitchen", item: "Teriyaki Quinoa Bowl", calories: 430, category: "Bowls", protein: 10, carbs: 59, fat: 21, price: 16.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            { id: 92, restaurant: "True Food Kitchen", item: "Korean Noodle Bowl", calories: 620, category: "Bowls", protein: 16, carbs: 110, fat: 16, price: 17.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            
-            // Entrées
-            { id: 93, restaurant: "True Food Kitchen", item: "Lasagne al Pesto", calories: 750, category: "Entrées", protein: 32, carbs: 50, fat: 46, price: 23.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            { id: 94, restaurant: "True Food Kitchen", item: "Grilled Sustainable Salmon", calories: 640, category: "Entrées", protein: 37, carbs: 14, fat: 48, price: 26.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            { id: 95, restaurant: "True Food Kitchen", item: "Grass-Fed Meatloaf", calories: 760, category: "Entrées", protein: 34, carbs: 29, fat: 58, price: 22.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            { id: 96, restaurant: "True Food Kitchen", item: "Spaghetti Squash Casserole", calories: 350, category: "Entrées", protein: 19, carbs: 31, fat: 17, price: 19.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            { id: 97, restaurant: "True Food Kitchen", item: "Grilled Grass-Fed Tenderloin", calories: 1150, category: "Entrées", protein: 48, carbs: 28, fat: 93, price: 32.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            { id: 98, restaurant: "True Food Kitchen", item: "Chicken Parmesan", calories: 820, category: "Entrées", protein: 47, carbs: 52, fat: 41, price: 24.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            { id: 99, restaurant: "True Food Kitchen", item: "Pesto Pasta", calories: 840, category: "Entrées", protein: 18, carbs: 62, fat: 61, price: 21.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            
-            // Desserts
-            { id: 100, restaurant: "True Food Kitchen", item: "Flourless Chocolate Cake", calories: 660, category: "Desserts", protein: 8, carbs: 67, fat: 47, price: 12.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            { id: 101, restaurant: "True Food Kitchen", item: "Chocolate Peanut Butter Tart", calories: 720, category: "Desserts", protein: 20, carbs: 68, fat: 45, price: 11.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            { id: 102, restaurant: "True Food Kitchen", item: "Chocolate Chip Cookie", calories: 400, category: "Desserts", protein: 3, carbs: 59, fat: 20, price: 5.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            { id: 103, restaurant: "True Food Kitchen", item: "Cosmic Bliss Ice Cream", calories: 270, category: "Desserts", protein: 4, carbs: 21, fat: 19, price: 7.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            
-            // Brunch Items
-            { id: 104, restaurant: "True Food Kitchen", item: "Avocado Toast", calories: 930, category: "Brunch", protein: 9, carbs: 46, fat: 80, price: 16.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            { id: 105, restaurant: "True Food Kitchen", item: "Blueberry Pancakes", calories: 820, category: "Brunch", protein: 10, carbs: 113, fat: 37, price: 15.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            { id: 106, restaurant: "True Food Kitchen", item: "Southwest Tofu Scramble", calories: 590, category: "Brunch", protein: 35, carbs: 52, fat: 29, price: 17.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            { id: 107, restaurant: "True Food Kitchen", item: "Farmer's Market Scramble", calories: 760, category: "Brunch", protein: 39, carbs: 21, fat: 58, price: 18.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            { id: 108, restaurant: "True Food Kitchen", item: "Breakfast Tacos", calories: 620, category: "Brunch", protein: 33, carbs: 55, fat: 32, price: 16.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            
-            // Kids Menu
-            { id: 109, restaurant: "True Food Kitchen", item: "Kids Grass-fed Cheeseburger", calories: 570, category: "Kids Menu", protein: 51, carbs: 44, fat: 23, price: 12.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            { id: 110, restaurant: "True Food Kitchen", item: "Kids Chicken Teriyaki Bowl", calories: 630, category: "Kids Menu", protein: 33, carbs: 47, fat: 36, price: 11.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true },
-            { id: 111, restaurant: "True Food Kitchen", item: "Kids Cheese Pizza", calories: 850, category: "Kids Menu", protein: 33, carbs: 131, fat: 20, price: 10.95, distance: 0.8, rating: 4.3, verified: true, source: "Official Nutrition Guide", isLocal: true }
-        ];
-
-        // Isolated search bar component to prevent focus loss
-        const SearchBar = memo(({ searchQuery, onSearchChange }) => {
-            const inputRef = useRef(null);
-
-            return (
-                <div className="bg-white rounded-xl shadow-sm p-4 mb-4">
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                        <input
-                            ref={inputRef}
-                            type="text"
-                            placeholder="Search restaurants and menu items..."
-                            className="search-input w-full pl-10 pr-4 py-3 bg-gray-50 rounded-lg border-0 focus:ring-2 focus:ring-blue-500"
-                            value={searchQuery}
-                            onChange={(e) => onSearchChange(e.target.value)}
-                            autoComplete="off"
-                            spellCheck="false"
-                        />
-                    </div>
+        // Isolated search bar component
+        const SearchBar = memo(({ searchQuery, onSearchChange }) => (
+            <div className="bg-white rounded-xl shadow-sm p-4 mb-4">
+                <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                    <input
+                        type="text"
+                        placeholder="Search restaurants and menu items..."
+                        className="search-input w-full pl-10 pr-4 py-3 bg-gray-50 rounded-lg border-0 focus:ring-2 focus:ring-blue-500"
+                        value={searchQuery}
+                        onChange={(e) => onSearchChange(e.target.value)}
+                        autoComplete="off"
+                        spellCheck="false"
+                    />
                 </div>
-            );
-        });
+            </div>
+        ));
 
-        // Optimized restaurant card component
+        // Restaurant card component
         const RestaurantCard = memo(({ item, onAddToFavorites, onAddToTracking, isFavorited }) => {
             const getCalorieBadge = useCallback((calories) => {
                 if (calories < 300) return 'bg-green-100 text-green-800';
@@ -333,11 +180,7 @@
                                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${getCalorieBadge(item.calories)}`}>
                                         {item.calories} cal
                                     </span>
-                                    {item.verified ? (
-                                        <Shield className="h-4 w-4 text-green-600" />
-                                    ) : (
-                                        <span className="text-orange-500 text-xs">⚠️</span>
-                                    )}
+                                    <Shield className="h-4 w-4 text-green-600" />
                                 </div>
                             </div>
                             
@@ -388,9 +231,8 @@
                                 </div>
                             </div>
                             
-                            <div className="text-xs text-gray-400 flex items-center">
-                                {item.verified ? '✅ Verified' : '⚠️ Estimated'} • {item.source}
-                                {item.verified && <span className="ml-2 text-green-500">•</span>}
+                            <div className="text-xs text-gray-400">
+                                ✅ Verified • {item.source}
                             </div>
                         </div>
                     </div>
@@ -398,7 +240,21 @@
             );
         });
 
+        // Loading component
+        const LoadingCard = memo(() => (
+            <div className="bg-white rounded-xl shadow-sm p-4 mb-3">
+                <div className="loading">
+                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                    <div className="h-3 bg-gray-200 rounded w-1/2 mb-2"></div>
+                    <div className="h-3 bg-gray-200 rounded w-1/4"></div>
+                </div>
+            </div>
+        ));
+
         const LocalPlateApp = () => {
+            // Load restaurant data
+            const { data: restaurantData, loading, error } = useRestaurantData();
+            
             // State
             const [currentView, setCurrentView] = useState('discover');
             const [searchQuery, setSearchQuery] = useState('');
@@ -410,462 +266,56 @@
             const [showDisclaimer, setShowDisclaimer] = useState(true);
             const [isPremium, setIsPremium] = useState(false);
 
-            // Memoized search results to prevent unnecessary re-renders
+            // Memoized search results
             const filteredRestaurants = useMemo(() => {
-                if (!searchQuery.trim()) {
-                    return RESTAURANT_DATA;
-                }
+                if (!searchQuery.trim()) return restaurantData;
                 
                 const query = searchQuery.toLowerCase().trim();
-                return RESTAURANT_DATA.filter(item => 
+                return restaurantData.filter(item => 
                     item.item.toLowerCase().includes(query) ||
                     item.restaurant.toLowerCase().includes(query) ||
                     item.category.toLowerCase().includes(query)
                 );
-            }, [searchQuery]);
+            }, [searchQuery, restaurantData]);
 
-            // Memoized callbacks to prevent re-renders
-            const handleSearchChange = useCallback((value) => {
-                setSearchQuery(value);
-            }, []);
+            // Handlers
+            const handleSearchChange = useCallback((value) => setSearchQuery(value), []);
 
             const addToConsumed = useCallback((item) => {
                 setConsumedToday(prev => [...prev, { ...item, timestamp: Date.now() }]);
                 setDailyCalories(prev => prev + item.calories);
-                // Show toast notification
-                showToast(`📊 Added "${item.item}" (${item.calories} cal) to daily tracking!`, 'success');
             }, []);
 
             const removeFromConsumed = useCallback((index) => {
                 const item = consumedToday[index];
                 setDailyCalories(prev => prev - item.calories);
                 setConsumedToday(prev => prev.filter((_, i) => i !== index));
-                showToast(`🗑️ Removed "${item.item}" from tracking`, 'info');
             }, [consumedToday]);
 
             const toggleFavorite = useCallback((item) => {
                 const isFavorited = favorites.some(fav => fav.id === item.id);
                 if (isFavorited) {
                     setFavorites(prev => prev.filter(fav => fav.id !== item.id));
-                    showToast(`💔 Removed "${item.item}" from favorites`, 'info');
                 } else {
                     setFavorites(prev => [...prev, item]);
-                    showToast(`❤️ Added "${item.item}" to favorites!`, 'success');
                 }
             }, [favorites]);
 
-            const captureEmail = useCallback((email, source) => {
-                if (!email.trim()) {
-                    showToast('Please enter your email address', 'error');
-                    return;
-                }
-                console.log('Email captured:', email, 'Source:', source);
-                showToast('🚀 Thanks! We\'ll notify you when the mobile app launches!', 'success');
-                setUserEmail('');
-            }, []);
-
-            // Toast notification function
-            const showToast = useCallback((message, type = 'info') => {
-                const toast = document.createElement('div');
-                toast.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg text-white transition-all duration-300 transform translate-x-full`;
-                
-                if (type === 'success') {
-                    toast.classList.add('bg-green-500');
-                } else if (type === 'error') {
-                    toast.classList.add('bg-red-500');
-                } else {
-                    toast.classList.add('bg-blue-500');
-                }
-                
-                toast.textContent = message;
-                document.body.appendChild(toast);
-                
-                // Animate in
-                setTimeout(() => {
-                    toast.classList.remove('translate-x-full');
-                }, 10);
-                
-                // Animate out after 3 seconds
-                setTimeout(() => {
-                    toast.classList.add('translate-x-full');
-                    setTimeout(() => {
-                        if (document.body.contains(toast)) {
-                            document.body.removeChild(toast);
-                        }
-                    }, 300);
-                }, 3000);
-            }, []);
-
-            // Memoized calculations
-            const calorieProgress = useMemo(() => Math.min((dailyCalories / dailyGoal) * 100, 100), [dailyCalories, dailyGoal]);
-            const remainingCalories = useMemo(() => dailyGoal - dailyCalories, [dailyGoal, dailyCalories]);
-            const totalProtein = useMemo(() => consumedToday.reduce((sum, item) => sum + item.protein, 0), [consumedToday]);
-            const totalCarbs = useMemo(() => consumedToday.reduce((sum, item) => sum + item.carbs, 0), [consumedToday]);
-            const totalFat = useMemo(() => consumedToday.reduce((sum, item) => sum + item.fat, 0), [consumedToday]);
-
-            // Disclaimer Modal
-            const DisclaimerModal = memo(() => (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-2xl max-w-md w-full p-6">
-                        <div className="flex items-center mb-4">
-                            <Shield className="h-6 w-6 text-blue-600 mr-3" />
-                            <h2 className="text-xl font-bold text-gray-800">Nutrition Disclaimer</h2>
-                        </div>
-                        
-                        <div className="space-y-4 text-sm text-gray-600">
-                            <p><strong>Important:</strong> Nutritional information is for informational purposes only.</p>
-                            <div className="bg-blue-50 p-3 rounded-lg">
-                                <p><strong>Data Sources:</strong></p>
-                                <ul className="list-disc list-inside mt-2 space-y-1">
-                                    <li>Chain restaurants: Official nutrition calculators</li>
-                                    <li>Local restaurants: From official menus where available</li>
-                                    <li>Values may vary by location and preparation</li>
-                                </ul>
-                            </div>
-                            <p>Consult healthcare professionals for personalized dietary advice.</p>
-                        </div>
-
-                        <button
-                            onClick={() => setShowDisclaimer(false)}
-                            className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold mt-6"
-                        >
-                            I Understand
-                        </button>
-                    </div>
-                </div>
-            ));
-
-            // Mobile Navigation
-            const MobileNav = memo(() => (
-                <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2 z-40">
-                    <div className="flex justify-around">
-                        {[
-                            { view: 'discover', icon: Search, label: 'Discover' },
-                            { view: 'tracking', icon: Target, label: 'Track' },
-                            { view: 'premium', icon: Crown, label: 'Premium' },
-                            { view: 'about', icon: Info, label: 'Contact' }
-                        ].map(({ view, icon: Icon, label }) => (
-                            <button
-                                key={view}
-                                onClick={() => setCurrentView(view)}
-                                className={`flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-300 ${
-                                    currentView === view ? 'text-blue-600 transform -translate-y-1' : 'text-gray-500'
-                                }`}
-                            >
-                                <Icon className="icon-sm mb-1" />
-                                <span className="text-xs">{label}</span>
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            ));
-
-            // Main Views
-            const DiscoverView = memo(() => (
-                <div className="pb-20">
-                    {/* Data Notice */}
-                    <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
-                        <div className="flex items-center">
-                            <Shield className="h-5 w-5 text-blue-600 mr-2" />
-                            <p className="text-sm text-blue-800">
-                                <strong>Verified Data:</strong> Chain restaurants from official sources. Local restaurants from official menus.
-                            </p>
+            // Error state
+            if (error) {
+                return (
+                    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                        <div className="text-center">
+                            <h2 className="text-xl font-semibold text-red-600 mb-2">Error loading data</h2>
+                            <p className="text-gray-600">{error}</p>
                         </div>
                     </div>
+                );
+            }
 
-                    {/* Location */}
-                    <div className="bg-white rounded-xl shadow-sm p-4 mb-4">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center">
-                                <MapPin className="h-5 w-5 text-blue-600 mr-2" />
-                                <span className="text-gray-700 font-medium">San Francisco, CA</span>
-                            </div>
-                            <button className="text-blue-600 text-sm font-medium">Change</button>
-                        </div>
-                    </div>
-
-                    {/* Search */}
-                    <SearchBar searchQuery={searchQuery} onSearchChange={handleSearchChange} />
-
-                    {/* Results */}
-                    <div className="space-y-3">
-                        {filteredRestaurants.length === 0 ? (
-                            <div className="text-center py-12 text-gray-500 fade-in">
-                                <div className="text-6xl mb-4 animate-bounce">🔍</div>
-                                <h3 className="text-lg font-medium mb-2">No restaurants found</h3>
-                                <p className="text-sm mb-4">Try searching for something else</p>
-                                <div className="flex flex-wrap justify-center gap-2 mt-4">
-                                    <button onClick={() => setSearchQuery('coffee')} className="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm hover:bg-blue-200 transition-colors">coffee</button>
-                                    <button onClick={() => setSearchQuery('sandwich')} className="px-3 py-1 bg-green-100 text-green-600 rounded-full text-sm hover:bg-green-200 transition-colors">sandwich</button>
-                                    <button onClick={() => setSearchQuery('low calorie')} className="px-3 py-1 bg-purple-100 text-purple-600 rounded-full text-sm hover:bg-purple-200 transition-colors">low calorie</button>
-                                </div>
-                            </div>
-                        ) : (
-                            filteredRestaurants.map((item) => (
-                                <RestaurantCard
-                                    key={item.id}
-                                    item={item}
-                                    onAddToFavorites={toggleFavorite}
-                                    onAddToTracking={addToConsumed}
-                                    isFavorited={favorites.some(fav => fav.id === item.id)}
-                                />
-                            ))
-                        )}
-                    </div>
-
-                    {/* Premium CTA */}
-                    <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl shadow-lg p-6 text-white mt-6">
-                        <h3 className="text-lg font-semibold mb-2">Want More Local Restaurants?</h3>
-                        <p className="text-sm mb-4 opacity-90">
-                            Premium includes 500+ verified SF restaurants like Tartine, Blue Bottle, La Taqueria.
-                        </p>
-                        <button
-                            onClick={() => setCurrentView('premium')}
-                            className="bg-white text-purple-600 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-gray-100 transition-colors"
-                        >
-                            Upgrade to Premium - $4.99/month
-                        </button>
-                    </div>
-                </div>
-            ));
-
-            const TrackingView = memo(() => (
-                <div className="pb-20">
-                    {/* Progress */}
-                    <div className="bg-white rounded-xl shadow-sm p-6 mb-4">
-                        <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-xl font-semibold text-gray-800">Today's Progress</h2>
-                            <Target className="h-6 w-6 text-blue-600" />
-                        </div>
-                        
-                        <div className="mb-6">
-                            <div className="flex justify-between text-sm text-gray-600 mb-2">
-                                <span>Calories</span>
-                                <span>{dailyCalories} / {dailyGoal}</span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-4">
-                                <div 
-                                    className={`h-4 rounded-full progress-bar ${
-                                        calorieProgress > 100 ? 'bg-red-500' : 
-                                        calorieProgress > 80 ? 'bg-yellow-500' : 'bg-green-500'
-                                    }`}
-                                    style={{ width: `${Math.min(calorieProgress, 100)}%` }}
-                                ></div>
-                            </div>
-                            <div className="mt-3 text-center">
-                                <span className={`text-lg font-semibold ${
-                                    remainingCalories >= 0 ? 'text-green-600' : 'text-red-600'
-                                }`}>
-                                    {remainingCalories >= 0 
-                                        ? `${remainingCalories} calories remaining` 
-                                        : `${Math.abs(remainingCalories)} calories over goal`
-                                    }
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-3 gap-3">
-                            <div className="text-center p-3 bg-blue-50 rounded-lg">
-                                <div className="text-lg font-semibold text-blue-600">{totalProtein}g</div>
-                                <div className="text-xs text-gray-600">Protein</div>
-                            </div>
-                            <div className="text-center p-3 bg-yellow-50 rounded-lg">
-                                <div className="text-lg font-semibold text-yellow-600">{totalCarbs}g</div>
-                                <div className="text-xs text-gray-600">Carbs</div>
-                            </div>
-                            <div className="text-center p-3 bg-purple-50 rounded-lg">
-                                <div className="text-lg font-semibold text-purple-600">{totalFat}g</div>
-                                <div className="text-xs text-gray-600">Fat</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Meals */}
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <h3 className="text-lg font-semibold text-gray-800 mb-4">Today's Meals</h3>
-                        {consumedToday.length === 0 ? (
-                            <div className="text-center py-8 text-gray-500">
-                                <Clock className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-                                <p>No meals logged yet</p>
-                                <p className="text-sm">Add items from Discover!</p>
-                            </div>
-                        ) : (
-                            <div className="space-y-3">
-                                {consumedToday.map((item, index) => (
-                                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                        <div className="flex items-center">
-                                            <Shield className="h-4 w-4 text-green-600 mr-3" />
-                                            <div>
-                                                <div className="font-medium text-gray-800">{item.item}</div>
-                                                <div className="text-sm text-gray-600">{item.restaurant} • {item.calories} cal</div>
-                                            </div>
-                                        </div>
-                                        <button
-                                            onClick={() => removeFromConsumed(index)}
-                                            className="p-2 text-red-600 hover:bg-red-100 rounded-full transition-colors"
-                                        >
-                                            <Minus className="h-4 w-4" />
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                </div>
-            ));
-
-            const PremiumView = memo(() => (
-                <div className="pb-20">
-                    <div className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl shadow-lg p-6 text-white mb-6">
-                        <div className="flex items-center mb-4">
-                            <Crown className="h-8 w-8 mr-3" />
-                            <h2 className="text-2xl font-bold">LocalPlate Premium</h2>
-                        </div>
-                        <p className="mb-6">Get access to 500+ local SF restaurants with verified nutrition data</p>
-                        
-                        <button 
-                            onClick={() => {
-                                setIsPremium(true);
-                                showToast('🎉 Welcome to LocalPlate Premium!', 'success');
-                            }}
-                            className="bg-white text-orange-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
-                        >
-                            Start Free Trial - $4.99/month
-                        </button>
-                    </div>
-
-                    <div className="space-y-4">
-                        <div className={`bg-white rounded-xl shadow-sm p-6 ${!isPremium ? 'opacity-75' : ''}`}>
-                            <div className="flex items-center justify-between mb-3">
-                                <h3 className="text-lg font-semibold">500+ Local SF Restaurants</h3>
-                                {!isPremium && <span className="text-gray-400">🔒</span>}
-                            </div>
-                            <p className="text-gray-600 mb-4">Verified nutrition data for Tartine, Blue Bottle, La Taqueria, Swan Oyster Depot, and hundreds more local favorites</p>
-                            {isPremium && (
-                                <button className="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg text-sm font-medium">
-                                    Browse Local Restaurants
-                                </button>
-                            )}
-                        </div>
-
-                        <div className={`bg-white rounded-xl shadow-sm p-6 ${!isPremium ? 'opacity-75' : ''}`}>
-                            <div className="flex items-center justify-between mb-3">
-                                <h3 className="text-lg font-semibold">Advanced Meal Planning</h3>
-                                {!isPremium && <span className="text-gray-400">🔒</span>}
-                            </div>
-                            <p className="text-gray-600 mb-4">Plan your entire week with verified calorie data from your favorite restaurants</p>
-                            {isPremium && (
-                                <button className="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg text-sm font-medium">
-                                    Create Meal Plan
-                                </button>
-                            )}
-                        </div>
-
-                        <div className={`bg-white rounded-xl shadow-sm p-6 ${!isPremium ? 'opacity-75' : ''}`}>
-                            <div className="flex items-center justify-between mb-3">
-                                <h3 className="text-lg font-semibold">Nutrition Analytics</h3>
-                                {!isPremium && <span className="text-gray-400">🔒</span>}
-                            </div>
-                            <p className="text-gray-600 mb-4">Detailed insights and trends in your dining habits with exportable reports</p>
-                            {isPremium && (
-                                <button className="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg text-sm font-medium">
-                                    View Analytics
-                                </button>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl shadow-lg p-6 text-white mt-6">
-                        <h3 className="text-lg font-semibold mb-2">Join the Waitlist</h3>
-                        <p className="text-sm mb-4 opacity-90">Be first to access premium features when our mobile app launches.</p>
-                        <input
-                            type="email"
-                            placeholder="Enter your email"
-                            className="w-full p-3 rounded-lg text-gray-800 mb-3"
-                            value={userEmail}
-                            onChange={(e) => setUserEmail(e.target.value)}
-                        />
-                        <button 
-                            onClick={() => captureEmail(userEmail, 'premium_waitlist')}
-                            className="w-full bg-white text-purple-600 py-2 px-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
-                        >
-                            Join Waitlist
-                        </button>
-                    </div>
-                </div>
-            ));
-
-            const AboutView = memo(() => (
-                <div className="pb-20">
-                    <div className="bg-white rounded-xl shadow-sm p-6 mb-4">
-                        <div className="flex items-center mb-4">
-                            <Shield className="h-6 w-6 text-blue-600 mr-3" />
-                            <h2 className="text-xl font-semibold text-gray-800">Contact LocalPlate</h2>
-                        </div>
-                        
-                        <div className="space-y-4 text-gray-600">
-                            <p>LocalPlate helps you make informed dining choices with verified restaurant nutrition data.</p>
-                            
-                            <div className="bg-green-50 p-4 rounded-lg">
-                                <h3 className="font-semibold text-green-800 mb-2">For Restaurants</h3>
-                                <p className="text-sm text-green-700 mb-3">
-                                    Get featured on LocalPlate and reach health-conscious diners in your area.
-                                </p>
-                                <button 
-                                    onClick={() => window.open('mailto:partnerships@LocalPlate.com?subject=Restaurant Partnership&body=Hi! I\'m interested in featuring my restaurant on LocalPlate for $99/month.')}
-                                    className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
-                                >
-                                    Partner With Us - $99/month
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="bg-white rounded-xl shadow-sm p-6 mb-4">
-                        <h3 className="text-lg font-semibold text-gray-800 mb-4">Contact & Support</h3>
-                        <div className="space-y-3">
-                            <button 
-                                onClick={() => window.open('mailto:support@LocalPlate.com')}
-                                className="w-full text-left py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors border"
-                            >
-                                📧 support@LocalPlate.com
-                            </button>
-                            <button 
-                                onClick={() => window.open('mailto:partnerships@LocalPlate.com')}
-                                className="w-full text-left py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors border"
-                            >
-                                🤝 partnerships@LocalPlate.com
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl shadow-lg p-6 text-white">
-                        <h3 className="text-lg font-semibold mb-2">Mobile App Coming Soon!</h3>
-                        <p className="text-sm mb-4 opacity-90">
-                            Get notified when LocalPlate launches on iOS and Android.
-                        </p>
-                        <input
-                            type="email"
-                            placeholder="Enter your email for launch updates"
-                            className="w-full p-3 rounded-lg text-gray-800 mb-3"
-                            value={userEmail}
-                            onChange={(e) => setUserEmail(e.target.value)}
-                        />
-                        <button 
-                            onClick={() => captureEmail(userEmail, 'app_launch')}
-                            className="w-full bg-white text-blue-600 py-2 px-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
-                        >
-                            Notify Me at Launch
-                        </button>
-                    </div>
-                </div>
-            ));
-
+            // Main render
             return (
                 <div className="min-h-screen bg-gray-50">
-                    {/* Disclaimer Modal */}
-                    {showDisclaimer && <DisclaimerModal />}
-                    
                     {/* Header */}
                     <div className="bg-white shadow-sm border-b sticky top-0 z-30">
                         <div className="px-4 py-4">
@@ -891,14 +341,219 @@
 
                     {/* Main Content */}
                     <div className="px-4 py-4">
-                        {currentView === 'discover' && <DiscoverView />}
-                        {currentView === 'tracking' && <TrackingView />}
-                        {currentView === 'premium' && <PremiumView />}
-                        {currentView === 'about' && <AboutView />}
+                        {currentView === 'discover' && (
+                            <div className="pb-20">
+                                <SearchBar searchQuery={searchQuery} onSearchChange={handleSearchChange} />
+                                
+                                <div className="space-y-3">
+                                    {loading ? (
+                                        // Loading state
+                                        Array.from({ length: 5 }).map((_, i) => <LoadingCard key={i} />)
+                                    ) : filteredRestaurants.length === 0 ? (
+                                        // Empty state
+                                        <div className="text-center py-12 text-gray-500 fade-in">
+                                            <div className="text-6xl mb-4 animate-bounce">🔍</div>
+                                            <h3 className="text-lg font-medium mb-2">No restaurants found</h3>
+                                            <p className="text-sm mb-4">Try searching for something else</p>
+                                            <div className="flex flex-wrap justify-center gap-2 mt-4">
+                                                <button onClick={() => setSearchQuery('coffee')} className="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm hover:bg-blue-200 transition-colors">coffee</button>
+                                                <button onClick={() => setSearchQuery('sandwich')} className="px-3 py-1 bg-green-100 text-green-600 rounded-full text-sm hover:bg-green-200 transition-colors">sandwich</button>
+                                                <button onClick={() => setSearchQuery('low calorie')} className="px-3 py-1 bg-purple-100 text-purple-600 rounded-full text-sm hover:bg-purple-200 transition-colors">low calorie</button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        // Results
+                                        filteredRestaurants.map((item) => (
+                                            <RestaurantCard
+                                                key={item.id}
+                                                item={item}
+                                                onAddToFavorites={toggleFavorite}
+                                                onAddToTracking={addToConsumed}
+                                                isFavorited={favorites.some(fav => fav.id === item.id)}
+                                            />
+                                        ))
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {currentView === 'tracking' && (
+                            <div className="pb-20">
+                                <div className="bg-white rounded-xl shadow-sm p-6 mb-4">
+                                    <h2 className="text-xl font-semibold text-gray-800 mb-4">Today's Progress</h2>
+                                    
+                                    <div className="mb-6">
+                                        <div className="flex justify-between text-sm text-gray-600 mb-2">
+                                            <span>Calories</span>
+                                            <span>{dailyCalories} / {dailyGoal}</span>
+                                        </div>
+                                        <div className="w-full bg-gray-200 rounded-full h-4">
+                                            <div 
+                                                className="h-4 rounded-full progress-bar bg-green-500"
+                                                style={{ width: `${Math.min((dailyCalories / dailyGoal) * 100, 100)}%` }}
+                                            ></div>
+                                        </div>
+                                        <div className="mt-3 text-center">
+                                            <span className="text-lg font-semibold text-green-600">
+                                                {dailyGoal - dailyCalories >= 0 
+                                                    ? `${dailyGoal - dailyCalories} calories remaining` 
+                                                    : `${Math.abs(dailyGoal - dailyCalories)} calories over goal`
+                                                }
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-3 gap-3">
+                                        <div className="text-center p-3 bg-blue-50 rounded-lg">
+                                            <div className="text-lg font-semibold text-blue-600">{consumedToday.reduce((sum, item) => sum + item.protein, 0)}g</div>
+                                            <div className="text-xs text-gray-600">Protein</div>
+                                        </div>
+                                        <div className="text-center p-3 bg-yellow-50 rounded-lg">
+                                            <div className="text-lg font-semibold text-yellow-600">{consumedToday.reduce((sum, item) => sum + item.carbs, 0)}g</div>
+                                            <div className="text-xs text-gray-600">Carbs</div>
+                                        </div>
+                                        <div className="text-center p-3 bg-purple-50 rounded-lg">
+                                            <div className="text-lg font-semibold text-purple-600">{consumedToday.reduce((sum, item) => sum + item.fat, 0)}g</div>
+                                            <div className="text-xs text-gray-600">Fat</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white rounded-xl shadow-sm p-6">
+                                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Today's Meals</h3>
+                                    {consumedToday.length === 0 ? (
+                                        <div className="text-center py-8 text-gray-500">
+                                            <Clock className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                                            <p>No meals logged yet</p>
+                                            <p className="text-sm">Add items from Discover!</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-3">
+                                            {consumedToday.map((item, index) => (
+                                                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                                    <div className="flex items-center">
+                                                        <Shield className="h-4 w-4 text-green-600 mr-3" />
+                                                        <div>
+                                                            <div className="font-medium text-gray-800">{item.item}</div>
+                                                            <div className="text-sm text-gray-600">{item.restaurant} • {item.calories} cal</div>
+                                                        </div>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => removeFromConsumed(index)}
+                                                        className="p-2 text-red-600 hover:bg-red-100 rounded-full transition-colors"
+                                                    >
+                                                        <Minus className="h-4 w-4" />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {currentView === 'premium' && (
+                            <div className="pb-20">
+                                <div className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl shadow-lg p-6 text-white mb-6">
+                                    <div className="flex items-center mb-4">
+                                        <Crown className="h-8 w-8 mr-3" />
+                                        <h2 className="text-2xl font-bold">LocalPlate Premium</h2>
+                                    </div>
+                                    <p className="mb-6">Get access to 500+ local SF restaurants with verified nutrition data</p>
+                                    
+                                    <button 
+                                        onClick={() => setIsPremium(true)}
+                                        className="bg-white text-orange-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+                                    >
+                                        Start Free Trial - $4.99/month
+                                    </button>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <div className="bg-white rounded-xl shadow-sm p-6">
+                                        <h3 className="text-lg font-semibold mb-3">500+ Local SF Restaurants</h3>
+                                        <p className="text-gray-600 mb-4">Verified nutrition data for Tartine, Blue Bottle, La Taqueria, and hundreds more local favorites</p>
+                                        <button className="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg text-sm font-medium">
+                                            Browse Local Restaurants
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {currentView === 'about' && (
+                            <div className="pb-20">
+                                <div className="bg-white rounded-xl shadow-sm p-6 mb-4">
+                                    <h2 className="text-xl font-semibold text-gray-800 mb-4">Contact LocalPlate</h2>
+                                    <p className="text-gray-600 mb-4">LocalPlate helps you make informed dining choices with verified restaurant nutrition data.</p>
+                                    
+                                    <div className="space-y-3">
+                                        <button 
+                                            onClick={() => window.open('mailto:support@localplate.com')}
+                                            className="w-full text-left py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors border"
+                                        >
+                                            📧 support@localplate.com
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Mobile Navigation */}
-                    <MobileNav />
+                    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2 z-40">
+                        <div className="flex justify-around">
+                            {[
+                                { view: 'discover', icon: Search, label: 'Discover' },
+                                { view: 'tracking', icon: Target, label: 'Track' },
+                                { view: 'premium', icon: Crown, label: 'Premium' },
+                                { view: 'about', icon: Info, label: 'Contact' }
+                            ].map(({ view, icon: Icon, label }) => (
+                                <button
+                                    key={view}
+                                    onClick={() => setCurrentView(view)}
+                                    className={`flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-300 ${
+                                        currentView === view ? 'text-blue-600 transform -translate-y-1' : 'text-gray-500'
+                                    }`}
+                                >
+                                    <Icon className="icon-sm mb-1" />
+                                    <span className="text-xs">{label}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Disclaimer Modal */}
+                    {showDisclaimer && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                            <div className="bg-white rounded-2xl max-w-md w-full p-6">
+                                <div className="flex items-center mb-4">
+                                    <Shield className="h-6 w-6 text-blue-600 mr-3" />
+                                    <h2 className="text-xl font-bold text-gray-800">Nutrition Disclaimer</h2>
+                                </div>
+                                
+                                <div className="space-y-4 text-sm text-gray-600">
+                                    <p><strong>Important:</strong> Nutritional information is for informational purposes only.</p>
+                                    <div className="bg-blue-50 p-3 rounded-lg">
+                                        <p><strong>Data Sources:</strong></p>
+                                        <ul className="list-disc list-inside mt-2 space-y-1">
+                                            <li>Chain restaurants: Official nutrition calculators</li>
+                                            <li>Local restaurants: From official menus where available</li>
+                                            <li>Values may vary by location and preparation</li>
+                                        </ul>
+                                    </div>
+                                    <p>Consult healthcare professionals for personalized dietary advice.</p>
+                                </div>
+
+                                <button
+                                    onClick={() => setShowDisclaimer(false)}
+                                    className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold mt-6"
+                                >
+                                    I Understand
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             );
         };
