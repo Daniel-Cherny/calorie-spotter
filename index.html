@@ -317,6 +317,7 @@
             const [favorites, setFavorites] = useState([]);
             const [isPremium, setIsPremium] = useState(false);
             const [showFilters, setShowFilters] = useState(false);
+            const [showDisclaimer, setShowDisclaimer] = useState(true);
             const [filters, setFilters] = useState({
                 maxCalories: 1200,
                 sortBy: 'default',
@@ -402,7 +403,10 @@
                     <div className="bg-white shadow-sm border-b sticky top-0 z-30">
                         <div className="px-4 py-4">
                             <div className="flex items-center justify-between">
-                                <div className="flex items-center">
+                                <div 
+                                    className="flex items-center cursor-pointer"
+                                    onClick={() => setCurrentView('discover')}
+                                >
                                     <div className="bg-gradient-to-r from-blue-600 to-purple-600 w-8 h-8 rounded-full flex items-center justify-center mr-3">
                                         <Target className="h-5 w-5 text-white" />
                                     </div>
@@ -508,9 +512,12 @@
                                         <div className="space-y-3">
                                             {consumedToday.map((item, index) => (
                                                 <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                                    <div>
-                                                        <div className="font-medium text-gray-800">{item.item}</div>
-                                                        <div className="text-sm text-gray-600">{item.restaurant} • {item.calories} cal</div>
+                                                    <div className="flex items-center">
+                                                        <Shield className="h-4 w-4 text-green-600 mr-3" />
+                                                        <div>
+                                                            <div className="font-medium text-gray-800">{item.item}</div>
+                                                            <div className="text-sm text-gray-600">{item.restaurant} • {item.calories} cal</div>
+                                                        </div>
                                                     </div>
                                                     <button
                                                         onClick={() => removeFromConsumed(index)}
@@ -526,8 +533,52 @@
                             </div>
                         )}
                         
-                        {/* Other views can be added here following the same pattern */}
+                        {currentView === 'premium' && (
+                            <div className="pb-20">
+                                <div className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl shadow-lg p-6 text-white mb-6">
+                                    <div className="flex items-center mb-4">
+                                        <Crown className="h-8 w-8 mr-3" />
+                                        <h2 className="text-2xl font-bold">LocalPlate Premium</h2>
+                                    </div>
+                                    <p className="mb-6">Get access to 500+ local SF restaurants with verified nutrition data</p>
+                                    
+                                    <button 
+                                        onClick={() => setIsPremium(true)}
+                                        className="bg-white text-orange-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+                                    >
+                                        Start Free Trial - $4.99/month
+                                    </button>
+                                </div>
 
+                                <div className="space-y-4">
+                                    <div className="bg-white rounded-xl shadow-sm p-6">
+                                        <h3 className="text-lg font-semibold mb-3">500+ Local SF Restaurants</h3>
+                                        <p className="text-gray-600 mb-4">Verified nutrition data for Tartine, Blue Bottle, La Taqueria, and hundreds more local favorites</p>
+                                        <button className="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg text-sm font-medium">
+                                            Browse Local Restaurants
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {currentView === 'about' && (
+                            <div className="pb-20">
+                                <div className="bg-white rounded-xl shadow-sm p-6 mb-4">
+                                    <h2 className="text-xl font-semibold text-gray-800 mb-4">Contact LocalPlate</h2>
+                                    <p className="text-gray-600 mb-4">LocalPlate helps you make informed dining choices with verified restaurant nutrition data.</p>
+                                    
+                                    <div className="space-y-3">
+                                        <button 
+                                            onClick={() => window.open('mailto:support@localplate.com')}
+                                            className="w-full text-left py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors border"
+                                        >
+                                            📧 support@localplate.com
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Mobile Navigation */}
@@ -553,7 +604,37 @@
                         </div>
                     </div>
 
-                    {/* Disclaimer Modal would go here */}
+                    {/* Disclaimer Modal */}
+                    {showDisclaimer && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                            <div className="bg-white rounded-2xl max-w-md w-full p-6">
+                                <div className="flex items-center mb-4">
+                                    <Shield className="h-6 w-6 text-blue-600 mr-3" />
+                                    <h2 className="text-xl font-bold text-gray-800">Nutrition Disclaimer</h2>
+                                </div>
+                                
+                                <div className="space-y-4 text-sm text-gray-600">
+                                    <p><strong>Important:</strong> Nutritional information is for informational purposes only.</p>
+                                    <div className="bg-blue-50 p-3 rounded-lg">
+                                        <p><strong>Data Sources:</strong></p>
+                                        <ul className="list-disc list-inside mt-2 space-y-1">
+                                            <li>Chain restaurants: Official nutrition calculators</li>
+                                            <li>Local restaurants: From official menus where available</li>
+                                            <li>Values may vary by location and preparation</li>
+                                        </ul>
+                                    </div>
+                                    <p>Consult healthcare professionals for personalized dietary advice.</p>
+                                </div>
+
+                                <button
+                                    onClick={() => setShowDisclaimer(false)}
+                                    className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold mt-6"
+                                >
+                                    I Understand
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             );
         };
