@@ -24,6 +24,12 @@
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
         .filter-panel { transition: all 0.3s ease-out; max-height: 0; overflow: hidden; }
         .filter-panel.open { max-height: 500px; }
+        .flash-animation { animation: flash 0.5s ease-out; }
+        @keyframes flash { 
+            0% { background-color: rgba(59, 130, 246, 0); }
+            50% { background-color: rgba(59, 130, 246, 0.2); }
+            100% { background-color: rgba(59, 130, 246, 0); }
+        }
     </style>
 </head>
 <body>
@@ -223,7 +229,7 @@
             </div>
         ));
 
-        const RestaurantCard = memo(({ item, onAddToFavorites, onAddToTracking, isFavorited }) => {
+        const RestaurantCard = memo(({ item, onAddToFavorites, onAddToTracking, isFavorited, justAddedId }) => {
             const getCalorieBadge = useCallback((calories) => {
                 if (calories < 300) return 'bg-green-100 text-green-800';
                 if (calories < 500) return 'bg-yellow-100 text-yellow-800';
@@ -231,7 +237,7 @@
             }, []);
 
             return (
-                <div className="restaurant-card bg-white rounded-xl shadow-sm p-4 fade-in">
+                <div className={`restaurant-card bg-white rounded-xl shadow-sm p-4 fade-in ${justAddedId === item.id ? 'flash-animation' : ''}`}>
                     <div className="flex items-start justify-between">
                         <div className="flex-1">
                             <div className="flex items-center justify-between mb-2">
@@ -385,6 +391,7 @@
             const [showFilters, setShowFilters] = useState(false);
             const [showDisclaimer, setShowDisclaimer] = useState(true);
             const [showCustomEntry, setShowCustomEntry] = useState(false);
+            const [justAddedId, setJustAddedId] = useState(null);
             const [filters, setFilters] = useState({
                 maxCalories: 1200,
                 sortBy: 'default',
@@ -444,6 +451,8 @@
             const addToConsumed = useCallback((item) => {
                 setConsumedToday(prev => [...prev, { ...item, timestamp: Date.now() }]);
                 setDailyCalories(prev => prev + item.calories);
+                setJustAddedId(item.id);
+                setTimeout(() => setJustAddedId(null), 500); // Remove animation class after 500ms
             }, []);
             
             const handleAddCustomItem = useCallback((customItem) => {
@@ -554,6 +563,7 @@
                                                     onAddToFavorites={toggleFavorite}
                                                     onAddToTracking={addToConsumed}
                                                     isFavorited={favorites.some(fav => fav.id === item.id)}
+                                                    justAddedId={justAddedId}
                                                 />
                                             ))}
                                             {!isPremium && <UpgradePrompt onUpgradeClick={() => setCurrentView('premium')} />}
